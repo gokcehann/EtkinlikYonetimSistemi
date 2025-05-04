@@ -1,0 +1,6 @@
+@EtkinlikYonetimSistemi.API_HostAddress = http://localhost:5272
+
+GET {{EtkinlikYonetimSistemi.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

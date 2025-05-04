@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtkinlikYonetimSistemi.API", "EtkinlikYonetimSistemi.API\EtkinlikYonetimSistemi.API.csproj", "{4EAB7A3B-A933-4033-B22F-0B672F4F5802}"
+	ProjectSection(ProjectDependencies) = postProject
+		{62945BAA-8FB2-4F9B-A99C-706C508001B6} = {62945BAA-8FB2-4F9B-A99C-706C508001B6}
+		{73F4ABEE-E264-4CC8-ACAD-3E4C5B38E726} = {73F4ABEE-E264-4CC8-ACAD-3E4C5B38E726}
+		{B9E7A2C2-A478-49E4-97CA-E3D69B597AA8} = {B9E7A2C2-A478-49E4-97CA-E3D69B597AA8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtkinlikYonetimSistemi.Application", "EtkinlikYonetimSistemi.Application\EtkinlikYonetimSistemi.Application.csproj", "{62945BAA-8FB2-4F9B-A99C-706C508001B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtkinlikYonetimSistemi.Domain", "EtkinlikYonetimSistemi.Domain\EtkinlikYonetimSistemi.Domain.csproj", "{B9E7A2C2-A478-49E4-97CA-E3D69B597AA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtkinlikYonetimSistemi.Infrastructure", "EtkinlikYonetimSistemi.Infrastructure\EtkinlikYonetimSistemi.Infrastructure.csproj", "{73F4ABEE-E264-4CC8-ACAD-3E4C5B38E726}"
+	ProjectSection(ProjectDependencies) = postProject
+		{62945BAA-8FB2-4F9B-A99C-706C508001B6} = {62945BAA-8FB2-4F9B-A99C-706C508001B6}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EAB7A3B-A933-4033-B22F-0B672F4F5802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EAB7A3B-A933-4033-B22F-0B672F4F5802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EAB7A3B-A933-4033-B22F-0B672F4F5802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EAB7A3B-A933-4033-B22F-0B672F4F5802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62945BAA-8FB2-4F9B-A99C-706C508001B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62945BAA-8FB2-4F9B-A99C-706C508001B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62945BAA-8FB2-4F9B-A99C-706C508001B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62945BAA-8FB2-4F9B-A99C-706C508001B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9E7A2C2-A478-49E4-97CA-E3D69B597AA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9E7A2C2-A478-49E4-97CA-E3D69B597AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9E7A2C2-A478-49E4-97CA-E3D69B597AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9E7A2C2-A478-49E4-97CA-E3D69B597AA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73F4ABEE-E264-4CC8-ACAD-3E4C5B38E726}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73F4ABEE-E264-4CC8-ACAD-3E4C5B38E726}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73F4ABEE-E264-4CC8-ACAD-3E4C5B38E726}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73F4ABEE-E264-4CC8-ACAD-3E4C5B38E726}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {93EA2996-1186-4339-A36E-02E6F6095AAD}
+	EndGlobalSection
+EndGlobal
