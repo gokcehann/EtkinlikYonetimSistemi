@@ -18,14 +18,37 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
             _ilgiAlaniRepository = ilgiAlaniRepository;
         }
 
-        public KayitDto KayitOl(KullaniciKayitDto dto)
+        public async Task<KayitDto> KayitOlAsync(KullaniciKayitDto dto)
         {
-            var mevcutKullanici = _kullaniciRepository.GetByEmailAsync(dto.Email);
+            var mevcutKullanici = await _kullaniciRepository.GetByEmailAsync(dto.Email);
+
             if (mevcutKullanici != null)
             {
                 return new KayitDto { Basarili = false, Mesaj = "Bu email zaten kayıtlı." };
             }
+
             //eger e posta daha önce kullanılmamışsa devam et. eger kullanılmışsa mesaj gönder. 
+
+            if (string.IsNullOrWhiteSpace(dto.Email))
+            {
+                return new KayitDto { Basarili = false, Mesaj = "Email boş olamaz." };
+            }
+            if (string.IsNullOrWhiteSpace(dto.Sifre))
+            {
+                return new KayitDto { Basarili = false, Mesaj = "Şifre boş olamaz." };
+            }
+            if (dto.IlgiAlaniIdleri == null || !dto.IlgiAlaniIdleri.Any())
+            {
+                return new KayitDto { Basarili = false, Mesaj = "En az bir ilgi alanı seçmelisiniz." };
+            }
+            if (string.IsNullOrWhiteSpace(dto.Ad))
+            {
+                return new KayitDto { Basarili = false, Mesaj = "Ad boş olamaz." };
+            }
+            if (string.IsNullOrWhiteSpace(dto.Soyad))
+            {
+                return new KayitDto { Basarili = false, Mesaj = "Soyad boş olamaz." };
+            }
 
             var yeniKullanici = new Kullanici
             {
@@ -41,13 +64,11 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
 
             if (dto.IlgiAlaniIdleri != null && dto.IlgiAlaniIdleri.Any())
             {
-                // Ilgi alanı id'leri ile ilgili nesneleri veritabanından çek
-                var ilgiAlanlari = _ilgiAlaniRepository.GetByIdsAsync(dto.IlgiAlaniIdleri); // Bu repository metodunu yazmalısın
-                yeniKullanici.IlgiAlanlari = (ICollection<IlgiAlani>)ilgiAlanlari;
+                var ilgiAlanlari = await _ilgiAlaniRepository.GetByIdsAsync(dto.IlgiAlaniIdleri);
+                yeniKullanici.IlgiAlanlari = ilgiAlanlari.ToList();
             }
 
-            //Veritabanına ekle
-            _kullaniciRepository.AddAsync(yeniKullanici);
+            await _kullaniciRepository.AddAsync(yeniKullanici);
 
             //Sonuç döndür (ID dahil)
             return new KayitDto
