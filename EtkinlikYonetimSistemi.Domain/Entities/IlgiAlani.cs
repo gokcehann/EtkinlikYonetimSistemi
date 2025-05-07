@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace EtkinlikYonetimSistemi.Domain.Entities
 {
     public class IlgiAlani
     {
-        public int Id { get; set; } // �rnek: "1" (ana kategori), "1a" (alt kategori)
+        public int Id { get; set; } // Örnek: "1" (ana kategori), "1a" (alt kategori)
         public string Ad { get; set; }
         public string Aciklama { get; set; }
         public bool AnaKategoriMi { get; set; } // Bu kategori ana kategori mi?

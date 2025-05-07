@@ -1,4 +1,4 @@
-using EtkinlikYonetimSistemi.Domain.Entities;
+﻿using EtkinlikYonetimSistemi.Domain.Entities;
 
 namespace EtkinlikYonetimSistemi.Application.Interfaces
 {

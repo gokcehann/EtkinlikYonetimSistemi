@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using EtkinlikYonetimSistemi.Infrastructure.Context;
 
 var builder = WebApplication.CreateBuilder(args);

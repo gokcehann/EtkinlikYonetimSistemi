@@ -1,21 +1,21 @@
-using EtkinlikYonetimSistemi.Application.Interfaces;
+﻿using EtkinlikYonetimSistemi.Application.Interfaces;
 using EtkinlikYonetimSistemi.Domain.Entities;
 using EtkinlikYonetimSistemi.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
 {
-    /// Kullanıcı verilerinin veritabanı işlemlerini gerçekleştiren repository sınıfı.
+    /// KullanÄ±cÄ± verilerinin veritabanÄ± iÅŸlemlerini gerÃ§ekleÅŸtiren repository sÄ±nÄ±fÄ±.
     public class KullaniciRepository : IKullaniciRepository
     {
         private readonly EventDbContext _context;
-        //Veritabanı bağlantısı için DbContext nesnesi
+        //VeritabanÄ± baÄŸlantÄ±sÄ± iÃ§in DbContext nesnesi
         public KullaniciRepository(EventDbContext context)
         {
             _context = context;
         }
 
-        // Belirtilen ID'ye sahip kullanıcıyı ve ilişkili ilgi alanlarını getirir.
+        // Belirtilen ID'ye sahip kullanÄ±cÄ±yÄ± ve iliÅŸkili ilgi alanlarÄ±nÄ± getirir.
         public async Task<Kullanici?> GetByIdAsync(int id)
         {
             return await _context.Kullanicilar
@@ -24,7 +24,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
 
         }
 
-        /// Belirtilen email adresine sahip kullanıcıyı ve ilişkili ilgi alanlarını getirir.
+        /// Belirtilen email adresine sahip kullanÄ±cÄ±yÄ± ve iliÅŸkili ilgi alanlarÄ±nÄ± getirir.
         public async Task<Kullanici?> GetByEmailAsync(string email)
         {
             return await _context.Kullanicilar
@@ -32,7 +32,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
                 .FirstOrDefaultAsync(k => k.Email == email);
         }
 
-        // Tüm kullanıcıları ve ilişkili ilgi alanlarını listeler.
+        // TÃ¼m kullanÄ±cÄ±larÄ± ve iliÅŸkili ilgi alanlarÄ±nÄ± listeler.
         public async Task<List<Kullanici>> GetAllAsync()
         {
             return await _context.Kullanicilar
@@ -40,14 +40,14 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        /// Yeni bir kullanıcı ekler ve değişiklikleri kaydeder.
+        /// Yeni bir kullanÄ±cÄ± ekler ve deÄŸiÅŸiklikleri kaydeder.
         public async Task AddAsync(Kullanici kullanici)
         {
             await _context.Kullanicilar.AddAsync(kullanici);
             await _context.SaveChangesAsync();
         }
 
-        /// Mevcut bir kullanıcıyı günceller ve değişiklikleri kaydeder.
+        /// Mevcut bir kullanÄ±cÄ±yÄ± gÃ¼nceller ve deÄŸiÅŸiklikleri kaydeder.
         public async Task UpdateAsync(Kullanici kullanici)
         {
             _context.Kullanicilar.Update(kullanici);
@@ -55,8 +55,8 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
         }
 
         /// <summary>
-        /// Belirtilen ID'ye sahip kullanıcıyı siler ve değişiklikleri kaydeder.
-        /// Kullanıcı bulunamazsa işlem yapılmaz.
+        /// Belirtilen ID'ye sahip kullanÄ±cÄ±yÄ± siler ve deÄŸiÅŸiklikleri kaydeder.
+        /// KullanÄ±cÄ± bulunamazsa iÅŸlem yapÄ±lmaz.
         /// </summary>
         public async Task DeleteAsync(int id)
         {
@@ -69,7 +69,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
         }
 
         /// <summary>
-        /// Belirtilen email adresine sahip bir kullanıcının var olup olmadığını kontrol eder.
+        /// Belirtilen email adresine sahip bir kullanÄ±cÄ±nÄ±n var olup olmadÄ±ÄŸÄ±nÄ± kontrol eder.
         /// </summary>
         public async Task<bool> ExistsAsync(string email)
         {

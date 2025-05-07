@@ -6,5 +6,7 @@ namespace EtkinlikYonetimSistemi.Application.Services
     {
         Task<KayitDto> KayitOlAsync(KullaniciKayitDto dto);
         //kayitol metodu kullanıcıdan gelen dtoyu alır ve bir sonuç döndürür
+
+        Task<GirisDto> GirisYapAsync(KullaniciGirisDto dto);
     }
 }

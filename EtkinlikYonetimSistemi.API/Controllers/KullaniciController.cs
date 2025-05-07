@@ -39,5 +39,18 @@ namespace EtkinlikYonetimSistemi.API.Controllers
 
             return Ok(sonuc);
         }
+
+        [HttpPost("giris")]
+        public async Task<IActionResult> GirisYap([FromBody] KullaniciGirisDto dto)
+        {
+            var sonuc = await _kullaniciService.GirisYapAsync(dto);
+
+            if (!sonuc.Basarili)
+            {
+                return BadRequest(sonuc);
+            }
+
+            return Ok(sonuc);
+        }
     }
 }

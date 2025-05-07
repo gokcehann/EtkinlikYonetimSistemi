@@ -1,4 +1,4 @@
-using EtkinlikYonetimSistemi.Application.Interfaces;
+﻿using EtkinlikYonetimSistemi.Application.Interfaces;
 using EtkinlikYonetimSistemi.Domain.Entities;
 using EtkinlikYonetimSistemi.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;

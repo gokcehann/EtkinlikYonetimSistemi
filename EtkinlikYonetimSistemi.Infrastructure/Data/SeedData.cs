@@ -1,4 +1,4 @@
-using EtkinlikYonetimSistemi.Domain.Entities;
+﻿using EtkinlikYonetimSistemi.Domain.Entities;
 
 namespace EtkinlikYonetimSistemi.Infrastructure.Data
 {
@@ -12,8 +12,8 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             var muzik = new IlgiAlani
             {
                 Id = 1,
-                Ad = "Müzik",
-                Aciklama = "Müzik etkinlikleri",
+                Ad = "MÃ¼zik",
+                Aciklama = "MÃ¼zik etkinlikleri",
                 AnaKategoriMi = true,
                 BasePrice = 200.00m,
                 UstKategoriId = 1
@@ -59,12 +59,12 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
                 UstKategoriId = 5
             };
 
-            // Müzik Alt Kategorileri
+            // MÃ¼zik Alt Kategorileri
             var rock = new IlgiAlani
             {
                 Id = 11,
                 Ad = "Rock",
-                Aciklama = "Rock müzik etkinlikleri",
+                Aciklama = "Rock mÃ¼zik etkinlikleri",
                 AnaKategoriMi = false,
                 UstKategoriId = 1
             };
@@ -73,7 +73,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 12,
                 Ad = "Pop",
-                Aciklama = "Pop müzik etkinlikleri",
+                Aciklama = "Pop mÃ¼zik etkinlikleri",
                 AnaKategoriMi = false,
                 UstKategoriId = 1
             };
@@ -82,7 +82,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 13,
                 Ad = "Klasik",
-                Aciklama = "Klasik müzik etkinlikleri",
+                Aciklama = "Klasik mÃ¼zik etkinlikleri",
                 AnaKategoriMi = false,
                 UstKategoriId = 1
             };
@@ -90,8 +90,8 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             var halkMuzigi = new IlgiAlani
             {
                 Id = 14,
-                Ad = "Halk Müzigi",
-                Aciklama = "Halk müziği etkinlikleri",
+                Ad = "Halk MÃ¼zigi",
+                Aciklama = "Halk mÃ¼ziÄŸi etkinlikleri",
                 AnaKategoriMi = false,
                 UstKategoriId = 1
             };
@@ -100,7 +100,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 15,
                 Ad = "Metal",
-                Aciklama = "Metal müzik etkinlikleri",
+                Aciklama = "Metal mÃ¼zik etkinlikleri",
                 AnaKategoriMi = false,
                 UstKategoriId = 1
             };
@@ -109,7 +109,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 16,
                 Ad = "Rap",
-                Aciklama = "Rap müzik etkinlikleri",
+                Aciklama = "Rap mÃ¼zik etkinlikleri",
                 AnaKategoriMi = false,
                 UstKategoriId = 1
             };
@@ -128,7 +128,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 21,
                 Ad = "Futbol",
-                Aciklama = "Futbol maçları  ",
+                Aciklama = "Futbol maÃ§larÄ±  ",
                 AnaKategoriMi = false,
                 UstKategoriId = 2
             };
@@ -137,7 +137,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 22,
                 Ad = "Basketbol",
-                Aciklama = "Basketbol maçları",
+                Aciklama = "Basketbol maÃ§larÄ±",
                 AnaKategoriMi = false,
                 UstKategoriId = 2
             };
@@ -146,7 +146,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 23,
                 Ad = "Voleybol",
-                Aciklama = "Voleybol maçları",
+                Aciklama = "Voleybol maÃ§larÄ±",
                 AnaKategoriMi = false,
                 UstKategoriId = 2
             };
@@ -155,7 +155,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             {
                 Id = 24,
                 Ad = "Formula 1",
-                Aciklama = "Formula 1 yarışları",
+                Aciklama = "Formula 1 yarÄ±ÅŸlarÄ±",
                 AnaKategoriMi = false,
                 UstKategoriId = 2
             };
@@ -163,14 +163,14 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Data
             var dogaYuruyusu = new IlgiAlani
             {
                 Id = 25,
-                Ad = "Doğa Yürüyüşü",
-                Aciklama = "Doğa yürüyüşleri",
+                Ad = "DoÄŸa YÃ¼rÃ¼yÃ¼ÅŸÃ¼",
+                Aciklama = "DoÄŸa yÃ¼rÃ¼yÃ¼ÅŸleri",
                 AnaKategoriMi = false,
                 UstKategoriId = 2
             };
 
 
-            // Tüm kategorileri listeye ekle
+            // TÃ¼m kategorileri listeye ekle
             ilgiAlanlari.AddRange(new[] { muzik, spor, teknoloji, tiyatro, gezi, rock, pop, klasik, halkMuzigi, metal, rap, dj, futbol, basketbol, voleybol, formula1, dogaYuruyusu });
 
             return ilgiAlanlari;

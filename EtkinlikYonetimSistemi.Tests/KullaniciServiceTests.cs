@@ -1,4 +1,4 @@
-using EtkinlikYonetimSistemi.Application.DTOs;
+ï»¿using EtkinlikYonetimSistemi.Application.DTOs;
 using EtkinlikYonetimSistemi.Application.Interfaces;
 using EtkinlikYonetimSistemi.Application.Services;
 using EtkinlikYonetimSistemi.Domain.Entities;
@@ -6,6 +6,8 @@ using Moq;
 using Xunit;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using System.Runtime.CompilerServices;
 
 namespace EtkinlikYonetimSistemi.Tests.Services
 {
@@ -27,7 +29,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
             var dto = new KullaniciKayitDto
             {
                 Ad = "Ali",
-                Soyad = "Yýlmaz",
+                Soyad = "Ylmaz",
                 Email = "ali@example.com",
                 Sifre = "sifre123",
                 IlgiAlaniIdleri = new List<int> { 1, 2 }
@@ -41,7 +43,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
 
             // Assert
             Assert.False(result.Basarili);
-            Assert.Equal("Bu email zaten kayýtlý.", result.Mesaj);
+            Assert.Equal("Bu email zaten kayÄ±tlÄ±.", result.Mesaj);
         }
 
         [Fact]
@@ -51,7 +53,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
             var dto = new KullaniciKayitDto
             {
                 Ad = "Ali",
-                Soyad = "Yýlmaz",
+                Soyad = "Ylmaz",
                 Email = "",
                 Sifre = "sifre123",
                 IlgiAlaniIdleri = new List<int> { 1 }
@@ -70,7 +72,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
             var dto = new KullaniciKayitDto
             {
                 Ad = "Ali",
-                Soyad = "Yýlmaz",
+                Soyad = "Ylmaz",
                 Email = "ali@example.com",
                 Sifre = "",
                 IlgiAlaniIdleri = new List<int> { 1 }
@@ -79,7 +81,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
             var result = await _service.KayitOlAsync(dto);
 
             Assert.False(result.Basarili);
-            Assert.Contains("Þifre", result.Mesaj);
+            Assert.Contains("Åžifre", result.Mesaj);
         }
 
         [Fact]
@@ -88,7 +90,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
             var dto = new KullaniciKayitDto
             {
                 Ad = "",
-                Soyad = "Yýlmaz",
+                Soyad = "Ylmaz",
                 Email = "ali@example.com",
                 Sifre = "123",
                 IlgiAlaniIdleri = new List<int> { 1 }
@@ -123,7 +125,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
         {
             var dto = new KullaniciKayitDto
             {
-                Ad = "Ayþe",
+                Ad = "Ayse",
                 Soyad = "Kara",
                 Email = "ayse@example.com",
                 Sifre = "gizli123",
@@ -132,7 +134,7 @@ namespace EtkinlikYonetimSistemi.Tests.Services
 
             _mockKullaniciRepo.Setup(r => r.GetByEmailAsync(dto.Email)).ReturnsAsync((Kullanici?)null);
             _mockIlgiAlaniRepo.Setup(r => r.GetByIdsAsync(dto.IlgiAlaniIdleri))
-                              .ReturnsAsync(new List<IlgiAlani> { new IlgiAlani { Id = 1, Ad = "Müzik" } });
+                              .ReturnsAsync(new List<IlgiAlani> { new IlgiAlani { Id = 1, Ad = "MÃƒÂ¼zik" } });
 
             _mockKullaniciRepo.Setup(r => r.AddAsync(It.IsAny<Kullanici>()))
                               .Returns(Task.CompletedTask);
@@ -140,7 +142,77 @@ namespace EtkinlikYonetimSistemi.Tests.Services
             var result = await _service.KayitOlAsync(dto);
 
             Assert.True(result.Basarili);
-            Assert.Equal("Kayýt baþarýlý, onay bekleniyor.", result.Mesaj);
+            Assert.Equal("KayÄ±t baÅŸarÄ±lÄ±, onay bekleniyor.", result.Mesaj);
         }
+
+        [Fact]
+        public async Task GirisYap_HataliEmail_Olmamali()
+        {
+            // Arrange
+            var dto = new KullaniciGirisDto
+            {
+                Email = "yanlis@example.com",
+                Sifre = "DogruSifre123"
+            };
+
+            _mockKullaniciRepo.Setup(r => r.GetByEmailAsync(dto.Email))
+                              .ReturnsAsync((Kullanici?)null); // KullanÃ„Â±cÃ„Â± yok
+
+            // Act
+            var sonuc = await _service.GirisYapAsync(dto);
+
+            // Assert
+            Assert.False(sonuc.Basarili);
+            Assert.Equal("KullanÄ±cÄ± bulunamadÄ±.", sonuc.Mesaj);
+        }
+
+        [Fact]
+        public async Task GirisYap_HataliSifre_Olmamali()
+        {
+            // Arrange
+            var dto = new KullaniciGirisDto
+            {
+                Email = "dogru@example.com",
+                Sifre = "YanlisSifre123"
+            };
+
+            var passwordHasher = new PasswordHasher<Kullanici>();
+            var kullanici = new Kullanici
+            {
+                Email = dto.Email,
+                SifreHash = passwordHasher.HashPassword(null, "GercekSifre123"),
+                LoginSayisi = 0
+            };
+
+            _mockKullaniciRepo.Setup(r => r.GetByEmailAsync(dto.Email))
+                              .ReturnsAsync(kullanici);
+
+            // Act
+            var sonuc = await _service.GirisYapAsync(dto);
+
+            // Assert
+            Assert.False(sonuc.Basarili);
+            Assert.Equal("Åžifre yanlÄ±ÅŸ.", sonuc.Mesaj);
+        }
+
+        [Fact]
+        public async Task GirisYap_BosAlanlar_Olmamali()
+        {
+            // Arrange
+            var dto = new KullaniciGirisDto
+            {
+                Email = "",
+                Sifre = ""
+            };
+
+            // Act
+            var sonuc = await _service.GirisYapAsync(dto);
+
+            // Assert
+            Assert.False(sonuc.Basarili);
+            Assert.Equal("Email ve ÅŸifre boÅŸ olamaz.", sonuc.Mesaj);
+        }
+
+
     }
 }

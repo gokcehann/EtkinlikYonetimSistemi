@@ -50,6 +50,7 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
                 return new KayitDto { Basarili = false, Mesaj = "Soyad boş olamaz." };
             }
 
+
             var yeniKullanici = new Kullanici
             {
                 Ad = dto.Ad,
@@ -77,7 +78,42 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
                 Mesaj = "Kayıt başarılı, onay bekleniyor.",
                 Id = yeniKullanici.Id // Son eklenen kullanıcının ID'si
             };
+        }
 
+
+        public async Task<GirisDto> GirisYapAsync(KullaniciGirisDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) && string.IsNullOrWhiteSpace(dto.Sifre))
+            {
+                return new GirisDto { Basarili = false, Mesaj = "Email ve şifre boş olamaz." };
+            }
+            if (string.IsNullOrWhiteSpace(dto.Email))
+            {
+                return new GirisDto { Basarili = false, Mesaj = "Email boş olamaz." };
+            }
+            if (string.IsNullOrWhiteSpace(dto.Sifre))
+            {
+                return new GirisDto { Basarili = false, Mesaj = "Şifre boş olamaz." };
+            }
+            var email = dto.Email.Trim().ToLower();
+            var kullanici = await _kullaniciRepository.GetByEmailAsync(dto.Email);
+            if (kullanici == null)
+            {
+                return new GirisDto { Basarili = false, Mesaj = "Kullanıcı bulunamadı." };
+            }
+            var dogrulamaSonucu = _passwordHasher.VerifyHashedPassword(kullanici, kullanici.SifreHash, dto.Sifre);
+            if (dogrulamaSonucu != PasswordVerificationResult.Success)
+            {
+                return new GirisDto { Basarili = false, Mesaj = "Şifre yanlış." };
+            }
+            kullanici.LoginSayisi++;
+            await _kullaniciRepository.UpdateAsync(kullanici);
+            return new GirisDto
+            {
+                Basarili = true,
+                Mesaj = "Giriş başarılı.",
+                SifreYenilemeGerekli = kullanici.LoginSayisi <= 1
+            };
         }
     }
 }
