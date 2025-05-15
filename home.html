@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biletika - Ana Sayfa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="home-page">
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">Biletika</a>
+        <div class="nav-right">
+            <a href="#" class="nav-link"><i class="fas fa-user"></i></a>
+            <a href="#" class="nav-link"><i class="fas fa-shopping-cart"></i></a>
+        </div>
+    </nav>
+
+    <div style="display: flex; margin-top: 20px;">
+        <div style="flex: 1; padding: 0 20px;">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1>İlgi Alanlarına Göre Etkinlikler</h1>
+                    <div class="event-slider" id="eventSlider">
+                        <!-- Etkinlikler JavaScript ile buraya eklenecek -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="categories-section">
+                <h2>Kategoriler</h2>
+                <div class="category-grid">
+                    <div class="category-card">
+                        <i class="fas fa-music"></i>
+                        <h3>Konser</h3>
+                    </div>
+                    <div class="category-card">
+                        <i class="fas fa-theater-masks"></i>
+                        <h3>Tiyatro</h3>
+                    </div>
+                    <div class="category-card">
+                        <i class="fas fa-running"></i>
+                        <h3>Spor</h3>
+                    </div>
+                    <div class="category-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Festival</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="announcements-section">
+            <h2>Duyurular</h2>
+            <div class="announcement-item">
+                <h3>Yeni Etkinlik: Rock Festivali</h3>
+                <p>Bu yaz en büyük rock festivali geliyor! Erken bilet fırsatını kaçırmayın.</p>
+                <div class="announcement-date">15 Mart 2024</div>
+            </div>
+            <div class="announcement-item">
+                <h3>Bilet İade Politikası Güncellendi</h3>
+                <p>Yeni bilet iade politikamız hakkında bilgi almak için tıklayın.</p>
+                <div class="announcement-date">10 Mart 2024</div>
+            </div>
+            <div class="announcement-item">
+                <h3>Öğrenci İndirimi</h3>
+                <p>Tüm etkinliklerde geçerli %20 öğrenci indirimi başladı!</p>
+                <div class="announcement-date">5 Mart 2024</div>
+            </div>
+            <div class="announcement-item">
+                <h3>Yeni Özellik: E-Bilet</h3>
+                <p>Artık tüm biletlerinizi cep telefonunuzda saklayabilirsiniz.</p>
+                <div class="announcement-date">1 Mart 2024</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Hakkımızda</h4>
+                <a href="#">Biz Kimiz</a>
+                <a href="#">İletişim</a>
+                <a href="#">Kariyer</a>
+            </div>
+            <div class="footer-section">
+                <h4>Yardım</h4>
+                <a href="#">Sıkça Sorulan Sorular</a>
+                <a href="#">Bilet İade</a>
+                <a href="#">Kullanım Koşulları</a>
+            </div>
+            <div class="footer-section">
+                <h4>Bizi Takip Edin</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Örnek etkinlik verileri (gerçek uygulamada bu veriler bir API'den gelecek)
+        const events = {
+            'Rock': [
+                { date: '15 Nisan 2024', location: 'İstanbul' },
+                { date: '20 Nisan 2024', location: 'Ankara' }
+            ],
+            'Tiyatro': [
+                { date: '18 Nisan 2024', location: 'İstanbul' },
+                { date: '22 Nisan 2024', location: 'İzmir' }
+            ],
+            'Pop': [
+                { date: '25 Nisan 2024', location: 'İstanbul' },
+                { date: '28 Nisan 2024', location: 'Ankara' }
+            ],
+            'Klasik': [
+                { date: '30 Nisan 2024', location: 'İstanbul' },
+                { date: '2 Mayıs 2024', location: 'İzmir' }
+            ],
+            'Halk Müziği': [
+                { date: '5 Mayıs 2024', location: 'İstanbul' },
+                { date: '8 Mayıs 2024', location: 'Ankara' }
+            ],
+            'Metal': [
+                { date: '10 Mayıs 2024', location: 'İstanbul' },
+                { date: '12 Mayıs 2024', location: 'İzmir' }
+            ],
+            'Rap': [
+                { date: '15 Mayıs 2024', location: 'İstanbul' },
+                { date: '18 Mayıs 2024', location: 'Ankara' }
+            ],
+            'Dj': [
+                { date: '20 Mayıs 2024', location: 'İstanbul' },
+                { date: '22 Mayıs 2024', location: 'İzmir' }
+            ],
+            'Basketbol': [
+                { date: '25 Mayıs 2024', location: 'İstanbul' },
+                { date: '28 Mayıs 2024', location: 'Ankara' }
+            ],
+            'Voleybol': [
+                { date: '1 Haziran 2024', location: 'İstanbul' },
+                { date: '3 Haziran 2024', location: 'İzmir' }
+            ],
+            'Formula 1': [
+                { date: '5 Haziran 2024', location: 'İstanbul' },
+                { date: '8 Haziran 2024', location: 'İzmir' }
+            ],
+            'Doğa Yürüyüşü': [
+                { date: '10 Haziran 2024', location: 'İstanbul' },
+                { date: '12 Haziran 2024', location: 'Ankara' }
+            ]
+        };
+
+        // Tarihleri karşılaştırmak için yardımcı fonksiyon
+        function compareDates(a, b) {
+            const months = {
+                'Ocak': 1, 'Şubat': 2, 'Mart': 3, 'Nisan': 4, 'Mayıs': 5, 'Haziran': 6,
+                'Temmuz': 7, 'Ağustos': 8, 'Eylül': 9, 'Ekim': 10, 'Kasım': 11, 'Aralık': 12
+            };
+            
+            const [dayA, monthA, yearA] = a.date.split(' ');
+            const [dayB, monthB, yearB] = b.date.split(' ');
+            
+            if (yearA !== yearB) return yearA - yearB;
+            if (months[monthA] !== months[monthB]) return months[monthA] - months[monthB];
+            return parseInt(dayA) - parseInt(dayB);
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventSlider = document.getElementById('eventSlider');
+            const userInterests = JSON.parse(localStorage.getItem('userInterests') || '[]');
+            
+            // Tüm etkinlikleri bir dizide topla
+            let allEvents = [];
+            userInterests.forEach(interest => {
+                if (events[interest]) {
+                    events[interest].forEach(event => {
+                        allEvents.push({
+                            ...event,
+                            interest: interest
+                        });
+                    });
+                }
+            });
+
+            // Etkinlikleri tarihe göre sırala
+            allEvents.sort(compareDates);
+            
+            // Sıralanmış etkinlikleri göster
+            allEvents.forEach(event => {
+                const eventCard = `
+                    <div class="event-card">
+                        <img src="https://via.placeholder.com/300x200" alt="${event.interest}">
+                        <div class="event-info">
+                            <h3>${event.interest}</h3>
+                            <p>${event.date}</p>
+                            <p>${event.location}</p>
+                            <button class="ticket-btn">Sepete Ekle</button>
+                        </div>
+                    </div>
+                `;
+                eventSlider.innerHTML += eventCard;
+            });
+
+            // Eğer hiç etkinlik yoksa
+            if (eventSlider.children.length === 0) {
+                eventSlider.innerHTML = '<p style="text-align: center; width: 100%;">Henüz ilgi alanınıza uygun etkinlik bulunmamaktadır.</p>';
+            }
+        });
+    </script>
+</body>
+</html> 

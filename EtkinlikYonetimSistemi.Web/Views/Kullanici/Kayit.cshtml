@@ -1,0 +1,304 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model EtkinlikYonetimSistemi.Web.Models.KayitViewModel
+@{
+    Layout = null; // Bu sayfanın kendi layout'u var
+    var videoPath = Url.Content("~/media/26344-357839084.mp4"); // Videonun yolunu doğru ayarladığından emin ol
+
+    // İlgi alanları (ID'leri veritabanındaki ID'lerle eşleşmeli)
+    var ilgiler = new[] {
+        new { Id = 3, Ad = "Teknoloji" },
+        new { Id = 5, Ad = "Tiyatro" },
+        new { Id = 4, Ad = "Gezi" },
+        new { Id = 11, Ad = "Rock" },
+        new { Id = 12, Ad = "Pop" },
+        new { Id = 13, Ad = "Klasik" },
+        new { Id = 14, Ad = "Halk Müziği" },
+        new { Id = 15, Ad = "Metal" },
+        new { Id = 16, Ad = "Rap" },
+        new { Id = 17, Ad = "Dj" },
+        new { Id = 22, Ad = "Basketbol" },
+        new { Id = 23, Ad = "Voleybol" },
+        new { Id = 24, Ad = "Formula 1" },
+        new { Id = 25, Ad = "Doğa Yürüyüşü" }
+        // ... Diğer ilgi alanlarını buraya ekleyebilirsin
+    };
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol</title>
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            min-width: 100vw;
+            overflow: hidden;
+        }
+
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.25);
+            z-index: 1;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .center-boxes {
+            flex: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        .glass-box {
+            background: rgba(255,255,255,0.75);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+            border-radius: 24px;
+            padding: 0.7rem 0.5rem;
+            min-width: 320px;
+            max-width: 320px;
+            height: 500px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+            .glass-box h2, .glass-box h1 {
+                text-align: center;
+                font-weight: bold;
+                margin-bottom: 1.1rem;
+                font-size: 1.1rem;
+            }
+
+        .interests-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+        }
+
+        .interest-btn {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.9rem 0;
+            border: none;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+            .interest-btn.selected {
+                background: #2563eb;
+                color: #fff;
+            }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1.1rem 1.2rem;
+            border-radius: 12px;
+            border: 1.5px solid #e0e0e0;
+            font-size: 1.15rem;
+            background: #f9f9f9;
+            transition: border 0.2s;
+        }
+
+            .form-control:focus {
+                border: 1.5px solid #2563eb;
+                outline: none;
+            }
+
+        .signup-btn {
+            width: 100%;
+            height: 56px;
+            padding: 0;
+            border-radius: 12px;
+            border: none;
+            background: #4f8cff;
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 0.7rem;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            line-height: 1;
+        }
+
+            .signup-btn:hover {
+                background: #2563eb;
+            }
+
+        .navbar {
+            width: 100vw;
+            position: relative;
+            z-index: 3;
+            background: #000;
+            padding: 0.7rem 1.5rem;
+            box-sizing: border-box;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            color: #fff;
+            font-size: 2rem;
+            font-family: 'Fira Mono', monospace;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @@media (max-width: 1000px) {
+            .center-boxes {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .glass-box {
+                min-width: 340px;
+                max-width: 98vw;
+                font-size: 1.05rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <video class="video-bg" autoplay muted loop playsinline>
+        <source src="@videoPath" type="video/mp4">
+        Tarayıcınız video etiketini desteklemiyor.
+    </video>
+    <div class="overlay"></div>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-logo">Biletika</a>
+    </nav>
+
+    <div class="main-content">
+        <div class="center-boxes">
+            <div class="glass-box">
+                <h2>İlgi Alanlarını Seç</h2>
+                <div class="interests-grid">
+                    @foreach (var ilgi in ilgiler)
+                    {
+                        <button type="button" class="interest-btn" data-interest-id="@ilgi.Id">@ilgi.Ad</button>
+                    }
+                </div>
+            </div>
+
+            <div class="glass-box">
+                <h1>Kayıt Ol</h1>
+                @Html.ValidationSummary(false, "", new { @class = "text-danger validation-summary-errors" }) <!-- Hata mesajlarını göster -->
+                
+                <form asp-action="Kayit" asp-controller="Kullanici" method="post" id="registerForm">
+                    <div class="form-group">
+                        <input asp-for="Ad" placeholder="Adınız" class="form-control" />
+                        <span asp-validation-for="Ad" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input asp-for="Soyad" placeholder="Soyadınız" class="form-control" />
+                        <span asp-validation-for="Soyad" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input asp-for="Email" placeholder="E-posta adresiniz" class="form-control" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input asp-for="Sifre" type="password" placeholder="Şifreniz" class="form-control" />
+                        <span asp-validation-for="Sifre" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input asp-for="SifreTekrar" type="password" placeholder="Şifreniz (Tekrar)" class="form-control" />
+                        <span asp-validation-for="SifreTekrar" class="text-danger"></span>
+                    </div>
+
+                    <!-- Seçilen ilgi alanları için gizli inputlar buraya eklenecek -->
+                    <div id="selectedInterestsContainer"></div>
+
+                    <input type="submit" value="Kayıt Ol" class="signup-btn" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.interest-btn').on('click', function () {
+                $(this).toggleClass('selected');
+            });
+
+            $('#registerForm').on('submit', function (e) {
+                var selectedInterestsContainer = $('#selectedInterestsContainer');
+                selectedInterestsContainer.empty(); // Önceki seçimleri temizle
+
+                var selectedIds = [];
+                $('.interest-btn.selected').each(function () {
+                    selectedIds.push($(this).data('interest-id'));
+                });
+
+                // Modeldeki IlgiAlaniIdleri listesi için doğru formatta inputlar oluştur
+                for (var i = 0; i < selectedIds.length; i++) {
+                    selectedInterestsContainer.append(
+                        $('<input>')
+                            .attr('type', 'hidden')
+                            .attr('name', 'IlgiAlaniIdleri[' + i + ']') // Model binding için doğru format
+                            .val(selectedIds[i])
+                    );
+                }
+                
+                // jQuery Unobtrusive Validation'ın formu submit etmesine izin ver.
+                // Gizli alanlar eklendiği için validasyon ve submit işlemi bunları içermelidir.
+            });
+        });
+    </script>
+</body>
+</html>
