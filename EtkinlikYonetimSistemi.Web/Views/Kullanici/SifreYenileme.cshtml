@@ -1,0 +1,35 @@
+@model EtkinlikYonetimSistemi.Web.Models.SifreYenilemeViewModel
+@{
+    ViewBag.Title = "Şifre Yenileme";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5" style="max-width:400px;">
+    <h2 class="mb-4">Şifre Yenileme</h2>
+    <form asp-action="SifreYenileme" method="post">
+        <div class="form-group mb-3">
+            <label for="Email">E-posta</label>
+            <input asp-for="Email" class="form-control" type="email" required />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <label for="YeniSifre">Yeni Şifre</label>
+            <input asp-for="YeniSifre" class="form-control" type="password" required />
+            <span asp-validation-for="YeniSifre" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <label for="YeniSifreTekrar">Yeni Şifre (Tekrar)</label>
+            <input asp-for="YeniSifreTekrar" class="form-control" type="password" required />
+            <span asp-validation-for="YeniSifreTekrar" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Şifreyi Değiştir</button>
+    </form>
+    @if (ViewBag.Hata != null)
+    {
+        <div class="text-danger mt-3">@ViewBag.Hata</div>
+    }
+    @if (ViewBag.Basarili != null)
+    {
+        <div class="text-success mt-3">@ViewBag.Basarili</div>
+    }
+</div> 

@@ -13,5 +13,9 @@
         public string Mesaj { get; set; } = string.Empty;
         public bool SifreYenilemeGerekli { get; set; }
         public object Token { get; internal set; }
+        public string Rol { get; set; } = string.Empty;
+        public int KullaniciId { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public int LoginSayisi { get; set; }
     }
 }

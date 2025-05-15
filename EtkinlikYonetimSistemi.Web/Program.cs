@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Connection String tanımla (appsettings.json içinde tanımlı olduğuna emin ol)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// 2. DbContext’i DI konteynerine ekle
+// 2. DbContext'i DI konteynerine ekle
 builder.Services.AddDbContext<EventDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -28,22 +28,39 @@ builder.Services.AddScoped<IPasswordHasher<Kullanici>, PasswordHasher<Kullanici>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.LoginPath = "/Kullanici/Giris";
+        options.LogoutPath = "/Kullanici/Cikis";
+        options.AccessDeniedPath = "/Kullanici/Giris";
         options.Cookie.Name = "EtkinlikYonetimi.Auth";
         options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
-        options.SlidingExpiration = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+
     });
+
+
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.Secure = CookieSecurePolicy.Always;
+    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+});
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.Secure = CookieSecurePolicy.Always;
+    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+});
+
 
 // 6. MVC için controller ve view servisini ekle
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
-var app = builder.Build();
 builder.Services.AddHttpClient();
 
+var app = builder.Build();
+
+app.UseCookiePolicy();
 
 // 7. Orta katmanlar (middleware pipeline)
 if (!app.Environment.IsDevelopment())
@@ -63,6 +80,6 @@ app.UseAuthorization();
 // 8. Default route
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Kullanici}/{action=Kayit}/{id?}");
+    pattern: "{controller=Kullanici}/{action=Giris}/{id?}");
 
 app.Run();

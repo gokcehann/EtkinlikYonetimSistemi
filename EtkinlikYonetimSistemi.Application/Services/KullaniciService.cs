@@ -126,7 +126,7 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
                 return new GirisDto { Basarili = false, Mesaj = "Şifre boş olamaz." };
             }
             var email = dto.Email.Trim().ToLower();
-            var kullanici = await _kullaniciRepository.GetByEmailAsync(dto.Email);
+            var kullanici = await _kullaniciRepository.GetByEmailAsync(email);
             if (kullanici == null)
             {
                 return new GirisDto { Basarili = false, Mesaj = "Kullanıcı bulunamadı." };
@@ -156,12 +156,6 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
             if (kullanici == null)
             {
                 return new KayitDto { Basarili = false, Mesaj = "Kullanıcı bulunamadı." };
-            }
-
-            var dogrulamaSonucu = _passwordHasher.VerifyHashedPassword(kullanici, kullanici.SifreHash, dto.EskiSifre);
-            if (dogrulamaSonucu != PasswordVerificationResult.Success)
-            {
-                return new KayitDto { Basarili = false, Mesaj = "Eski şifre yanlış." };
             }
 
             kullanici.SifreHash = _passwordHasher.HashPassword(kullanici, dto.YeniSifre);
