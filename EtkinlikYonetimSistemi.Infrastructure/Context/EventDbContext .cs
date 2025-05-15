@@ -1,15 +1,31 @@
 ﻿using EtkinlikYonetimSistemi.Domain.Entities;
 using EtkinlikYonetimSistemi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace EtkinlikYonetimSistemi.Infrastructure.Context
 {
     public class EventDbContext : DbContext
     {
+        private readonly ILoggerFactory _loggerFactory;
+
         public EventDbContext(DbContextOptions<EventDbContext> options) : base(options)
         {
+            _loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddConsole()
+                    .AddDebug()
+                    .SetMinimumLevel(LogLevel.Information);
+            });
         }
-        //constructor metod bu.optionun amacı veri bağlantı ayarlarını çekmek. base'in amacı dbcontexti bağlamak.
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLoggerFactory(_loggerFactory);
+            optionsBuilder.EnableSensitiveDataLogging();
+            base.OnConfiguring(optionsBuilder);
+        }
 
         public DbSet<Kullanici> Kullanicilar { get; set; }
         public DbSet<Etkinlik> Etkinlikler { get; set; }
@@ -19,21 +35,17 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Context
         public DbSet<SatinAlim> SatinAlimlar { get; set; }
         public DbSet<SatinAlimBileti> SatinAlimBiletleri { get; set; }
         public DbSet<IlgiAlani> IlgiAlanlari { get; set; }
-        //dbsetlerin amacı veri tabanındaki tabloları temsil etmek.
 
-        //amacı ilişkileri ve özelleştirmeleri yapar.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Composite Key'ler
             modelBuilder.Entity<SepetBileti>()
                 .HasKey(sb => new { sb.SepetId, sb.BiletId });
 
             modelBuilder.Entity<SatinAlimBileti>()
                 .HasKey(sa => new { sa.SatinAlimId, sa.BiletId });
 
-            // İlişkiler
             modelBuilder.Entity<Etkinlik>()
                 .HasOne(e => e.IlgiAlani)
                 .WithMany(i => i.Etkinlikler)
@@ -69,13 +81,11 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Context
                 .WithMany()
                 .HasForeignKey(sa => sa.BiletId);
 
-            // Kullanici ve IlgiAlani arasındaki many-to-many ilişki
             modelBuilder.Entity<Kullanici>()
                 .HasMany(k => k.IlgiAlanlari)
                 .WithMany(i => i.Kullanicilar)
                 .UsingEntity(j => j.ToTable("IlgiAlaniKullanici"));
 
-            // Seed Data
             modelBuilder.Entity<IlgiAlani>().HasData(SeedData.GetIlgiAlanlari());
         }
     }

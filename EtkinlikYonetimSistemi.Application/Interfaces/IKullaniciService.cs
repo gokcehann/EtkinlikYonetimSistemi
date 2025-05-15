@@ -9,10 +9,7 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
 
         Task<GirisDto> GirisYapAsync(KullaniciGirisDto dto);
 
-        Task<KayitDto> SifreDegistirAsync(SifreDegistirDto dto);
-
-        Task<bool> IlgiAlaniGuncelleAsync(IlgiAlaniGuncelle dto);
-
+        Task<SifreDegistirSonucDto> SifreDegistirAsync(SifreDegistirDto dto);
 
     }
 }

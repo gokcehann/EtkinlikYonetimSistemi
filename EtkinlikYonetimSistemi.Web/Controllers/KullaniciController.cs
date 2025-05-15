@@ -1,9 +1,13 @@
 ﻿using EtkinlikYonetimSistemi.Application.DTOs;
 using EtkinlikYonetimSistemi.Application.Interfaces;
 using EtkinlikYonetimSistemi.Web.Models;
+using Mapster;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 
 namespace EtkinlikYonetimSistemi.Web.Controllers
@@ -33,15 +37,7 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var dto = new KullaniciKayitDto
-            {
-                Ad = model.Ad,
-                Soyad = model.Soyad,
-                Email = model.Email,
-                Sifre = model.Sifre,
-                IlgiAlaniIdleri = model.IlgiAlaniIdleri
-            };
-
+            var dto = model.Adapt<KullaniciKayitDto>();
             var sonuc = await _kullaniciService.KayitOlAsync(dto);
 
             if (!sonuc.Basarili)
@@ -58,39 +54,91 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
         [HttpGet]
         public IActionResult Giris()
         {
-            return View();
+            return View(new GirisViewModel());
         }
 
         // POST: /Kullanici/Giris
         [HttpPost]
-        public async Task<IActionResult> Giris(KullaniciGirisDto dto)
+        public async Task<IActionResult> Giris(GirisViewModel model)
         {
-            var client = _httpClientFactory.CreateClient();
-            var json = JsonConvert.SerializeObject(dto);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            if (!ModelState.IsValid)
+                return View(model);
 
-            var response = await client.PostAsync("https://localhost:7040/api/Kullanicilar/giris", content);
+            var dto = model.Adapt<KullaniciGirisDto>();
+            var sonuc = await _kullaniciService.GirisYapAsync(dto);
 
-            if (response.IsSuccessStatusCode)
+            if (!sonuc.Basarili)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var sonuc = JsonConvert.DeserializeObject<GirisDto>(responseContent);
+                ModelState.AddModelError("", sonuc.Mesaj);
+                return View(model);
+            }
 
-                Response.Cookies.Append("jwtToken", sonuc.Token.ToString(), new CookieOptions
+            // Kullanıcı kimlik bilgilerini oluştur
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, model.Email),
+                new Claim(ClaimTypes.Role, "Kullanici")
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                new AuthenticationProperties
                 {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTimeOffset.Now.AddMinutes(30)
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
-                return RedirectToAction("Index", "Home");
-            }
-            else
+            if (sonuc.SifreYenilemeGerekli)
             {
-                var hata = await response.Content.ReadAsStringAsync();
-                ViewBag.Hata = "Giriş başarısız: " + hata;
-                return View(dto);
+                return RedirectToAction("SifreYenileme", "Kullanici");
             }
+
+            return RedirectToAction("Anasayfa", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult SifreYenileme()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> SifreYenileme(SifreYenilemeViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (model.YeniSifre != model.YeniSifreTekrar)
+            {
+                ModelState.AddModelError("", "Yeni şifreler uyuşmuyor!");
+                return View(model);
+            }
+
+            var dto = new SifreDegistirDto
+            {
+                Email = model.Email,
+                YeniSifre = model.YeniSifre
+            };
+
+            var sonuc = await _kullaniciService.SifreDegistirAsync(dto);
+
+            if (sonuc.Basarili)
+            {
+                TempData["Basarili"] = "Şifreniz başarıyla güncellendi.";
+                return RedirectToAction("Anasayfa", "Home");
+            }
+
+            ModelState.AddModelError("", sonuc.Mesaj ?? "Şifre değiştirme işlemi başarısız oldu.");
+            return View(model);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Cikis()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Giris");
         }
     }
 }

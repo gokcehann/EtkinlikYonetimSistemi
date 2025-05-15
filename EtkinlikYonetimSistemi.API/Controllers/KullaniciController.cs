@@ -53,7 +53,7 @@ namespace EtkinlikYonetimSistemi.API.Controllers
         }
 
         [HttpPost("sifre-degistir")]
-        [Authorize] // Giriş yapmış olması gerek
+        [AllowAnonymous]
         public async Task<IActionResult> SifreDegistir([FromBody] SifreDegistirDto dto)
         {
             var sonuc = await _kullaniciService.SifreDegistirAsync(dto);

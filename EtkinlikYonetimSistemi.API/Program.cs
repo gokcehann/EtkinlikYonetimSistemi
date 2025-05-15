@@ -1,88 +1,125 @@
 ﻿using EtkinlikYonetimSistemi.Application.Interfaces;
-using EtkinlikYonetimSistemi.Application.Services;
+using EtkinlikYonetimSistemi.Domain.Entities;
 using EtkinlikYonetimSistemi.Infrastructure.Context;
 using EtkinlikYonetimSistemi.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
-internal class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. Veritabanı bağlantısı
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<EventDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// 2. Katman bağımlılıkları
+builder.Services.AddScoped<IKullaniciRepository, KullaniciRepository>();
+builder.Services.AddScoped<IKullaniciService, KullaniciService>();
+builder.Services.AddScoped<IIlgiAlaniRepository, IlgiAlaniRepository>();
+builder.Services.AddScoped<IPasswordHasher<Kullanici>, PasswordHasher<Kullanici>>();
+
+// 3. JWT Ayarları
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+builder.Services.AddAuthentication(options =>
 {
-    private static void Main(string[] args)
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = true;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        var builder = WebApplication.CreateBuilder(args);
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!))
+    };
+});
 
-        // Add services to the container.
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+// 4. Swagger JWT desteği
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Etkinlik API", Version = "v1" });
 
-        // CORS politikası ekleniyor
-        builder.Services.AddCors(options =>
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT token'ınızı şu formatta girin: Bearer {token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            options.AddPolicy("AllowAll",
-                builder =>
-                {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyMethod()
-                           .AllowAnyHeader();
-                });
-        });
-
-        // EventDbContext servise ekleniyor
-        builder.Services.AddDbContext<EventDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-        // JWT Authentication
-        builder.Services.AddAuthentication("Bearer")
-            .AddJwtBearer("Bearer", options =>
+            new OpenApiSecurityScheme
             {
-                options.TokenValidationParameters = new TokenValidationParameters
+                Reference = new OpenApiReference
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(
-                            builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key değeri eksik!")
-                        )
-                    )
-                };
-            });
-
-        builder.Services.AddAuthorization();
-
-        // Servisler
-        builder.Services.AddScoped<IEtkinlikService, EtkinlikService>();
-        builder.Services.AddScoped<IEtkinlikRepository, EtkinlikRepository>();
-        builder.Services.AddScoped<IHavaDurumuService, HavaDurumuService>();
-        builder.Services.AddScoped<IIlgiAlaniRepository, IlgiAlaniRepository>();
-        builder.Services.AddScoped<IKullaniciRepository, KullaniciRepository>();
-        builder.Services.AddScoped<IKullaniciService, KullaniciService>();
-        builder.Services.AddHttpClient();
-
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
         }
+    });
+});
 
-        app.UseHttpsRedirection();
+// 5. MVC ve HTTP servisleri
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpClient();
 
-        // CORS middleware'i ekleniyor
-        app.UseCors("AllowAll");
+// CORS ayarları
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
-        app.UseAuthentication();
-        app.UseAuthorization();
+var app = builder.Build();
 
-        app.MapControllers();
-
-        app.Run();
-    }
+// 6. Middleware sıralaması
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseCors("AllowAll"); // CORS middleware'i JWT'den önce eklenmelidir
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Etkinlik API V1");
+});
+
+app.MapControllers();
+
+app.Run();

@@ -223,6 +223,40 @@ namespace EtkinlikYonetimSistemi.Tests.Services
             Assert.Equal("Email ve şifre boş olamaz.", sonuc.Mesaj);
         }
 
+        [Fact]
+        public async Task SifreDegistir_BasariliOlmali()
+        {
+            // Arrange
+            var dto = new SifreDegistirDto
+            {
+                Email = "test@example.com",
+                YeniSifre = "yeniSifre123"
+            };
 
+            var kullanici = new Kullanici
+            {
+                Ad = "Test",
+                Soyad = "Kullanici",
+                Email = dto.Email,
+                SifreHash = "eskiHash",
+                Rol = "Kullanici",
+                LoginSayisi = 1,
+                OnayliMi = true
+            };
+
+            _mockKullaniciRepo.Setup(r => r.GetByEmailAsync(dto.Email))
+                             .ReturnsAsync(kullanici);
+
+            _mockKullaniciRepo.Setup(r => r.UpdateAsync(It.IsAny<Kullanici>()))
+                             .Returns(Task.CompletedTask);
+
+            // Act
+            var sonuc = await _service.SifreDegistirAsync(dto);
+
+            // Assert
+            Assert.True(sonuc.Basarili);
+            Assert.Equal("Şifre başarıyla değiştirildi.", sonuc.Mesaj);
+            _mockKullaniciRepo.Verify(r => r.UpdateAsync(It.IsAny<Kullanici>()), Times.Once);
+        }
     }
 }

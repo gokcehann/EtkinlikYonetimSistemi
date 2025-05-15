@@ -2,6 +2,7 @@
 using EtkinlikYonetimSistemi.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,12 +17,14 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
         private readonly IIlgiAlaniRepository _ilgiAlaniRepository;
         private readonly PasswordHasher<Kullanici> _passwordHasher = new PasswordHasher<Kullanici>();
         private readonly IConfiguration _configuration;
+        private readonly ILogger<KullaniciService> _logger;
 
-        public KullaniciService(IKullaniciRepository kullaniciRepository, IIlgiAlaniRepository ilgiAlaniRepository, IConfiguration configuration)
+        public KullaniciService(IKullaniciRepository kullaniciRepository, IIlgiAlaniRepository ilgiAlaniRepository, IConfiguration configuration, ILogger<KullaniciService> logger)
         {
             _kullaniciRepository = kullaniciRepository;
             _ilgiAlaniRepository = ilgiAlaniRepository;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<KayitDto> KayitOlAsync(KullaniciKayitDto dto)
@@ -126,7 +129,7 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
                 return new GirisDto { Basarili = false, Mesaj = "Şifre boş olamaz." };
             }
             var email = dto.Email.Trim().ToLower();
-            var kullanici = await _kullaniciRepository.GetByEmailAsync(dto.Email);
+            var kullanici = await _kullaniciRepository.GetByEmailAsync(email);
             if (kullanici == null)
             {
                 return new GirisDto { Basarili = false, Mesaj = "Kullanıcı bulunamadı." };
@@ -150,44 +153,56 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
             };
         }
 
-        public async Task<KayitDto> SifreDegistirAsync(SifreDegistirDto dto)
+        public async Task<SifreDegistirSonucDto> SifreDegistirAsync(SifreDegistirDto dto)
         {
-            var kullanici = await _kullaniciRepository.GetByIdAsync(dto.KullaniciId);
-            if (kullanici == null)
+            try
             {
-                return new KayitDto { Basarili = false, Mesaj = "Kullanıcı bulunamadı." };
-            }
+                _logger.LogInformation($"Şifre değiştirme işlemi başlatıldı. Email: {dto.Email}");
 
-            var dogrulamaSonucu = _passwordHasher.VerifyHashedPassword(kullanici, kullanici.SifreHash, dto.EskiSifre);
-            if (dogrulamaSonucu != PasswordVerificationResult.Success)
+                if (string.IsNullOrWhiteSpace(dto.Email))
+                {
+                    _logger.LogWarning("Email adresi boş gönderildi.");
+                    return new SifreDegistirSonucDto { Basarili = false, Mesaj = "Email adresi boş olamaz." };
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.YeniSifre))
+                {
+                    _logger.LogWarning("Yeni şifre boş gönderildi.");
+                    return new SifreDegistirSonucDto { Basarili = false, Mesaj = "Yeni şifre boş olamaz." };
+                }
+
+                var kullanici = await _kullaniciRepository.GetByEmailAsync(dto.Email.Trim().ToLower());
+                if (kullanici == null)
+                {
+                    _logger.LogWarning($"Kullanıcı bulunamadı. Email: {dto.Email}");
+                    return new SifreDegistirSonucDto { Basarili = false, Mesaj = "Bu email adresine sahip kullanıcı bulunamadı." };
+                }
+
+                _logger.LogInformation($"Kullanıcı bulundu. ID: {kullanici.Id}, Email: {kullanici.Email}");
+
+                var eskiSifreHash = kullanici.SifreHash;
+                kullanici.SifreHash = _passwordHasher.HashPassword(kullanici, dto.YeniSifre);
+                
+                _logger.LogInformation($"Yeni şifre hash'lendi. Eski hash: {eskiSifreHash}, Yeni hash: {kullanici.SifreHash}");
+
+                try
+                {
+                    await _kullaniciRepository.UpdateAsync(kullanici);
+                    _logger.LogInformation($"Kullanıcı güncellendi. ID: {kullanici.Id}, Yeni Hash: {kullanici.SifreHash}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Kullanıcı güncellenirken hata oluştu. ID: {kullanici.Id}");
+                    throw;
+                }
+
+                return new SifreDegistirSonucDto { Basarili = true, Mesaj = "Şifre başarıyla değiştirildi." };
+            }
+            catch (Exception ex)
             {
-                return new KayitDto { Basarili = false, Mesaj = "Eski şifre yanlış." };
+                _logger.LogError(ex, "Şifre değiştirme işlemi sırasında bir hata oluştu.");
+                return new SifreDegistirSonucDto { Basarili = false, Mesaj = "Şifre değiştirme işlemi sırasında bir hata oluştu." };
             }
-
-            kullanici.SifreHash = _passwordHasher.HashPassword(kullanici, dto.YeniSifre);
-            await _kullaniciRepository.UpdateAsync(kullanici);
-
-            return new KayitDto { Basarili = true, Mesaj = "Şifre başarıyla değiştirildi." };
-        }
-
-        public async Task<bool> IlgiAlaniGuncelleAsync(IlgiAlaniGuncelle dto)
-        {
-            var kullanici = await _kullaniciRepository.GetByIdAsync(dto.Id);
-            if (kullanici == null)
-                return false;
-
-            // Mevcut ilgi alanlarını sil
-            kullanici.IlgiAlanlari.Clear();
-
-            // Yeni ilgi alanlarını veritabanından çek ve ekle
-            var ilgiAlanlari = await _ilgiAlaniRepository.GetByIdsAsync(dto.IlgiAlaniIdleri);
-            foreach (var ilgiAlani in ilgiAlanlari)
-            {
-                kullanici.IlgiAlanlari.Add(ilgiAlani);
-            }
-
-            await _kullaniciRepository.UpdateAsync(kullanici);
-            return true;
         }
     }
 }
