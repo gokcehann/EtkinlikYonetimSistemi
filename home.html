@@ -12,7 +12,7 @@
         <a href="home.html" class="navbar-logo">Biletika</a>
         <div class="nav-right">
             <a href="#" class="nav-link"><i class="fas fa-user"></i></a>
-            <a href="#" class="nav-link"><i class="fas fa-shopping-cart"></i></a>
+            <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i></a>
         </div>
     </nav>
 
@@ -168,48 +168,85 @@
             return parseInt(dayA) - parseInt(dayB);
         }
 
+        // Kategori eşlemesi
+        const categoryMap = {
+            'Müzik': ['Rock', 'Pop', 'Klasik', 'Halk Müziği', 'Metal', 'Rap', 'Dj'],
+            'Spor': ['Basketbol', 'Voleybol', 'Doğa Yürüyüşü', 'Formula 1'],
+            'Teknoloji': ['Teknoloji'],
+            'Gezi': ['Gezi'],
+            'Tiyatro': ['Tiyatro']
+        };
+
         // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
             const eventSlider = document.getElementById('eventSlider');
             const userInterests = JSON.parse(localStorage.getItem('userInterests') || '[]');
             
-            // Tüm etkinlikleri bir dizide topla
-            let allEvents = [];
-            userInterests.forEach(interest => {
-                if (events[interest]) {
-                    events[interest].forEach(event => {
-                        allEvents.push({
-                            ...event,
-                            interest: interest
-                        });
-                    });
+            // Kullanıcının seçtiği kategorileri bul
+            let selectedCategories = [];
+            for (const [cat, interests] of Object.entries(categoryMap)) {
+                if (userInterests.some(i => interests.includes(i))) {
+                    selectedCategories.push(cat);
                 }
-            });
+            }
 
-            // Etkinlikleri tarihe göre sırala
-            allEvents.sort(compareDates);
-            
-            // Sıralanmış etkinlikleri göster
-            allEvents.forEach(event => {
-                const eventCard = `
-                    <div class="event-card">
-                        <img src="https://via.placeholder.com/300x200" alt="${event.interest}">
-                        <div class="event-info">
-                            <h3>${event.interest}</h3>
-                            <p>${event.date}</p>
-                            <p>${event.location}</p>
-                            <button class="ticket-btn">Sepete Ekle</button>
+            let hasEvents = false;
+            selectedCategories.forEach(category => {
+                // Kategori başlığı ekle
+                const catTitle = document.createElement('h2');
+                catTitle.textContent = category;
+                catTitle.style.margin = '30px 0 10px 0';
+                eventSlider.appendChild(catTitle);
+                // O kategoriye ait ilgi alanlarını bul
+                const interestsInCat = categoryMap[category].filter(i => userInterests.includes(i));
+                // O ilgi alanlarına ait etkinlikleri sırala
+                let allEvents = [];
+                interestsInCat.forEach(interest => {
+                    if (events[interest]) {
+                        events[interest].forEach(event => {
+                            allEvents.push({
+                                ...event,
+                                interest: interest
+                            });
+                        });
+                    }
+                });
+                allEvents.sort(compareDates);
+                // Etkinlikleri göster
+                allEvents.forEach(event => {
+                    hasEvents = true;
+                    const eventCard = `
+                        <div class="event-card">
+                            <img src="https://via.placeholder.com/300x200" alt="${event.interest}">
+                            <div class="event-info">
+                                <h3>${event.interest}</h3>
+                                <p>${event.date}</p>
+                                <p>${event.location}</p>
+                                <button class="ticket-btn" onclick='addToCart(${JSON.stringify(event)})'>Sepete Ekle</button>
+                            </div>
                         </div>
-                    </div>
-                `;
-                eventSlider.innerHTML += eventCard;
+                    `;
+                    eventSlider.innerHTML += eventCard;
+                });
             });
-
-            // Eğer hiç etkinlik yoksa
-            if (eventSlider.children.length === 0) {
+            if (!hasEvents) {
                 eventSlider.innerHTML = '<p style="text-align: center; width: 100%;">Henüz ilgi alanınıza uygun etkinlik bulunmamaktadır.</p>';
             }
         });
+
+        // Sepete ekle fonksiyonu
+        function addToCart(eventObj) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.push({
+                interest: eventObj.interest,
+                date: eventObj.date,
+                location: eventObj.location,
+                price: eventObj.price || 100,
+                quantity: 1
+            });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Etkinlik sepete eklendi!');
+        }
     </script>
 </body>
-</html> 
+</html>  kategorili hali

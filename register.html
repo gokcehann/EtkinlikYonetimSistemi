@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">Biletika</a>
+    </nav>
+
+    <div class="container">
+        <div class="video-section">
+            <div class="baslik">
+                Biletika
+            </div>
+            <div class="promotion-text">
+                <h2>Biletika'ya Üye Ol!</h2>
+                <p>İlgi alanlarını seç ve biletini satın al</p>
+            </div>
+            <video autoplay muted loop>
+                <source src="media/26344-357839084.mp4" type="video/mp4">
+            </video>
+        </div>
+       
+        <div class="interests-section">
+            <h2>İlgi Alanlarını Seç</h2>
+            <div class="interests-grid">
+                <button class="interest-btn" data-interest="Teknoloji">Teknoloji</button>
+                <button class="interest-btn" data-interest="Tiyatro">Tiyatro</button>
+                <button class="interest-btn" data-interest="Gezi">Gezi</button>
+                <button class="interest-btn" data-interest="Rock">Rock</button>
+                <button class="interest-btn" data-interest="Pop">Pop</button>
+                <button class="interest-btn" data-interest="Klasik">Klasik</button>
+                <button class="interest-btn" data-interest="Halk Müziği">Halk Müziği</button>
+                <button class="interest-btn" data-interest="Metal">Metal</button>
+                <button class="interest-btn" data-interest="Rap">Rap</button>
+                <button class="interest-btn" data-interest="Dj">Dj</button>
+                <button class="interest-btn" data-interest="Basketbol">Basketbol</button>
+                <button class="interest-btn" data-interest="Voleybol">Voleybol</button>
+                <button class="interest-btn" data-interest="Formula 1">Formula 1</button>
+                <button class="interest-btn" data-interest="Doğa Yürüyüşü">Doğa Yürüyüşü</button>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <h1>Kayıt Ol</h1>
+                <div class="form-group">
+                    <input type="text" id="name" placeholder="Ad" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="surname" placeholder="Soyad" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="e-posta" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="şifre" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password-confirm" placeholder="şifre tekrar" required>
+                </div>
+                <input type="submit" value="Kayıt Ol" class="signup-btn">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const interestButtons = document.querySelectorAll('.interest-btn');
+            
+            interestButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+        });
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+
+            // Şifre kontrolü
+            if (password !== passwordConfirm) {
+                alert('Şifreler eşleşmiyor!');
+                return;
+            }
+
+            // Seçili ilgi alanlarını topla
+            const selectedInterests = Array.from(document.querySelectorAll('.interest-btn.selected'))
+                .map(button => button.dataset.interest);
+
+            // Yeni kullanıcının e-postasını ve ilgi alanlarını localStorage'a kaydet
+            localStorage.setItem('newUserEmail', email);
+            localStorage.setItem('userInterests', JSON.stringify(selectedInterests));
+            
+            // Giriş sayfasına yönlendir
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

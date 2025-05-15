@@ -65,4 +65,71 @@
         }
     </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="index.html" class="navbar-logo">Biletika</a>
+    </div>
+
+    <div class="container">
+        <div class="baslik">
+            Biletika
+        </div>
+        <div class="promotion-text">
+            <h2>Biletika'ya Üye Ol!</h2>
+            <p>Üyeliğin ardından biletini satın al</p>
+        </div>
+        <video autoplay muted loop>
+            <source src="media/26344-357839084.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="signup-form">
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <h1><i class="fas fa-user"></i> Giriş Yap</h1>
+            <input type="email" id="email" placeholder="e-posta" class="txt" required>
+            <input type="password" id="password" placeholder="şifre" class="txt" required>
+            <input type="submit" value="Giriş Yap" class="signin-btn">
+            <a href="register.html" class="signup-btn">Hesap Oluştur</a>
+        </form>
+    </div>
+
+    <script>
+        // Yeni kayıt olan kullanıcıların e-postalarını localStorage'da tutacağız
+        document.addEventListener('DOMContentLoaded', function() {
+            // Register sayfasından gelen yeni kullanıcı e-postasını kontrol et
+            const newUserEmail = localStorage.getItem('newUserEmail');
+            if (newUserEmail) {
+                // Eğer yeni kayıt olan kullanıcı giriş yapıyorsa
+                document.getElementById('email').value = newUserEmail;
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Yeni kayıt olan kullanıcı mı kontrol et
+            const newUserEmail = localStorage.getItem('newUserEmail');
+            
+            if (newUserEmail === email) {
+                // Yeni kullanıcı için şifre yenileme sayfasına yönlendir
+                localStorage.removeItem('newUserEmail'); // Kullanıldıktan sonra temizle
+                window.location.href = 'password-renewal.html';
+            } else {
+                // Kayıtlı kullanıcı için ana sayfaya yönlendir
+                window.location.href = 'home.html';
+            }
+        }
+    </script>
+</body>
 </html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sepetim - Biletika</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .cart-page {
+            min-height: 100vh;
+            padding-top: 60px;
+        }
+
+        .cart-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .cart-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .cart-items {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-details {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 20px;
+        }
+
+        .quantity-btn {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .quantity-display {
+            font-size: 16px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+
+        .remove-btn:hover {
+            color: #cc0000;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .cart-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .clear-cart-btn {
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .clear-cart-btn:hover {
+            background: #c82333;
+        }
+
+        .max-tickets-warning {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #538fef;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .checkout-btn:hover {
+            background: #3a7bd5;
+        }
+
+        .payment-modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.4);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .payment-modal.active {
+            display: flex;
+        }
+        .payment-box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 32px 24px;
+            min-width: 320px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .payment-box h2 {
+            margin-bottom: 20px;
+        }
+        .payment-options {
+            display: flex;
+            flex-direction: row;
+            gap: 32px;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        .payment-options label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            background: #f5f5f5;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .payment-options input[type="radio"] {
+            accent-color: #538fef;
+            width: 18px;
+            height: 18px;
+        }
+        .payment-btn {
+            background: #538fef;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .payment-btn:hover {
+            background: #3a7bd5;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 22px;
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            cursor: pointer;
+        }
+        .payment-success {
+            text-align: center;
+            font-size: 22px;
+            color: #2ecc40;
+            margin-top: 40px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-page">
+        <nav class="navbar">
+            <a href="home.html" class="navbar-logo">Biletika</a>
+            <div class="nav-right">
+                <a href="#" class="nav-link"><i class="fas fa-user"></i></a>
+                <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i></a>
+            </div>
+        </nav>
+
+        <div class="cart-container">
+            <h1 class="cart-title">Sepetim</h1>
+            <div class="cart-items" id="cartItems">
+                <!-- Sepet öğeleri JavaScript ile buraya eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-box">
+            <button class="close-modal" onclick="closePaymentModal()">&times;</button>
+            <h2>Ödeme Yöntemi Seçin</h2>
+            <form id="paymentForm">
+                <div class="payment-options">
+                    <label><input type="radio" name="payment" value="Kredi Kartı" required> Kredi Kartı</label>
+                    <label><input type="radio" name="payment" value="Kapıda Ödeme"> Kapıda Ödeme</label>
+                </div>
+                <button type="submit" class="payment-btn">Onayla</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartItems = document.getElementById('cartItems');
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc; margin-bottom: 20px;"></i>
+                        <p>Sepetiniz boş</p>
+                    </div>
+                `;
+            } else {
+                cart.forEach((item, index) => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${item.interest}</div>
+                            <div class="cart-item-details">
+                                <p>Tarih: ${item.date}</p>
+                                <p>Konum: ${item.location}</p>
+                                <p>Fiyat: ${item.price || 100} TL</p>
+                            </div>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                            <span class="quantity-display">${item.quantity || 1}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                            <div class="max-tickets-warning" id="warning-${index}" style="display: ${(item.quantity || 1) >= 10 ? 'block' : 'none'}">Maksimum 10 bilet alabilirsiniz</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromCart(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+
+                // Sepet özeti ekle
+                const cartSummary = document.createElement('div');
+                cartSummary.className = 'cart-summary';
+                cartSummary.innerHTML = `
+                    <div class="cart-actions">
+                        <button class="clear-cart-btn" onclick="clearCart()">Sepeti Temizle</button>
+                    </div>
+                    <div class="cart-total">
+                        <span>Toplam Tutar:</span>
+                        <span id="totalAmount">0 TL</span>
+                    </div>
+                `;
+                cartItems.appendChild(cartSummary);
+
+                // Ödeme butonu ekle
+                const checkoutBtn = document.createElement('a');
+                checkoutBtn.href = '#';
+                checkoutBtn.className = 'checkout-btn';
+                checkoutBtn.textContent = 'Ödemeye Geç';
+                checkoutBtn.onclick = function(e) {
+                    e.preventDefault();
+                    document.getElementById('paymentModal').classList.add('active');
+                };
+                cartItems.appendChild(checkoutBtn);
+
+                // Toplam tutarı güncelle
+                updateTotalAmount();
+            }
+        });
+
+        // Toplam tutarı güncelleme fonksiyonu
+        function updateTotalAmount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const total = cart.reduce((sum, item) => {
+                return sum + ((item.price || 100) * (item.quantity || 1));
+            }, 0);
+            document.getElementById('totalAmount').textContent = `${total} TL`;
+        }
+
+        // Sepeti temizleme fonksiyonu
+        function clearCart() {
+            if (confirm('Sepetteki tüm biletleri silmek istediğinize emin misiniz?')) {
+                localStorage.setItem('cart', '[]');
+                location.reload();
+            }
+        }
+
+        // Bilet sayısını güncelleme fonksiyonu
+        function updateQuantity(index, change) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (!cart[index].quantity) {
+                cart[index].quantity = 1;
+            }
+            const newQuantity = cart[index].quantity + change;
+            const warningElement = document.getElementById(`warning-${index}`);
+            // Maksimum bilet kontrolü
+            if (newQuantity > 10) {
+                warningElement.style.display = 'block';
+                return;
+            }
+            // Minimum bilet kontrolü
+            if (newQuantity < 1) {
+                cart[index].quantity = 1;
+            } else {
+                cart[index].quantity = newQuantity;
+            }
+            // localStorage güncelle
+            localStorage.setItem('cart', JSON.stringify(cart));
+            // DOM'daki sayıyı anlık güncelle
+            document.querySelectorAll('.quantity-display')[index].textContent = cart[index].quantity;
+            warningElement.style.display = cart[index].quantity >= 10 ? 'block' : 'none';
+            // Toplam tutarı güncelle
+            updateTotalAmount();
+        }
+
+        // Sepetten ürün silme fonksiyonu
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            location.reload();
+        }
+
+        // Payment modal fonksiyonları
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+        document.getElementById('paymentForm').onsubmit = function(e) {
+            e.preventDefault();
+            const method = document.querySelector('input[name="payment"]:checked').value;
+            closePaymentModal();
+            // Sepeti boşalt
+            localStorage.setItem('cart', '[]');
+            // Sepet içeriğini temizle ve başarı mesajı göster
+            document.querySelector('.cart-container').innerHTML = '<div class="payment-success">Ödeme başarıyla tamamlandı<br><span style="font-size:16px;color:#333;">Anasayfaya yönlendiriliyorsunuz...</span></div>';
+            setTimeout(function() {
+                window.location.href = "home.html";
+            }, 3000);
+        };
+    </script>
+</body>
+</html> 
