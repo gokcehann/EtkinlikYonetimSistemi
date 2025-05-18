@@ -54,12 +54,13 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
         [HttpGet]
         public IActionResult Giris()
         {
-            return View();
+            var model = new GirisViewModel();
+            return View(model);
         }
 
         // POST: /Kullanici/Giris
         [HttpPost]
-        public async Task<IActionResult> Giris(KullaniciGirisDto dto)
+        public async Task<IActionResult> Giris(GirisViewModel dto)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -73,19 +74,49 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
                 return View(model);
             }
 
-                Response.Cookies.Append("jwtToken", sonuc.Token.ToString(), new CookieOptions
+                // JWT Token'ı cookie'ye yaz (Güvenlik için Secure ve SameSite ayarlarını yap)
+                Response.Cookies.Append("jwtToken", sonuc.Token?.ToString() ?? string.Empty, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
+                    Secure = true, // https zorunluysa true, değilse false olabilir
+                    SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.Now.AddMinutes(30)
                 });
 
-                return RedirectToAction("Index", "Home");
+                // Kullanıcı bilgilerini Claims ile ASP.NET'e tanıt
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, sonuc.Email),
+                    new Claim(ClaimTypes.NameIdentifier, sonuc.KullaniciId.ToString()),
+                    new Claim(ClaimTypes.Role, sonuc.Rol ?? "Kullanici")
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                    });
+
+                // loginSayisi 0'dan büyükse anasayfaya, 0 ise şifre yenileme sayfasına yönlendir
+                if (sonuc.LoginSayisi > 0)
+                {
+                    return RedirectToAction("Anasayfa", "Kullanici");
+                }
+                else
+                {
+                    return RedirectToAction("SifreYenileme", "Kullanici");
+                }
             }
             else
             {
                 var hata = await response.Content.ReadAsStringAsync();
-                ViewBag.Hata = "Giriş başarısız: " + hata;
+                dynamic hataObj = JsonConvert.DeserializeObject(hata);
+                string mesaj = hataObj?.mesaj ?? hata;
+                ViewBag.Hata = "Giriş başarısız: " + mesaj;
                 return View(dto);
             }
         }
