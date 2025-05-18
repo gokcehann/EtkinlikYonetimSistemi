@@ -54,12 +54,12 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
         [HttpGet]
         public IActionResult Giris()
         {
-            return View(new GirisViewModel());
+            return View();
         }
 
         // POST: /Kullanici/Giris
         [HttpPost]
-        public async Task<IActionResult> Giris(GirisViewModel model)
+        public async Task<IActionResult> Giris(KullaniciGirisDto dto)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -73,30 +73,21 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
                 return View(model);
             }
 
-            // Kullanıcı kimlik bilgilerini oluştur
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, model.Email),
-                new Claim(ClaimTypes.Role, "Kullanici")
-            };
-
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                new AuthenticationProperties
+                Response.Cookies.Append("jwtToken", sonuc.Token.ToString(), new CookieOptions
                 {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = DateTimeOffset.Now.AddMinutes(30)
                 });
 
-            if (sonuc.SifreYenilemeGerekli)
-            {
-                return RedirectToAction("SifreYenileme", "Kullanici");
+                return RedirectToAction("Index", "Home");
             }
-
-            return RedirectToAction("Anasayfa", "Home");
+            else
+            {
+                var hata = await response.Content.ReadAsStringAsync();
+                ViewBag.Hata = "Giriş başarısız: " + hata;
+                return View(dto);
+            }
         }
 
         [HttpGet]
@@ -104,6 +95,7 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> SifreYenileme(SifreYenilemeViewModel model)
         {
@@ -116,29 +108,40 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
                 return View(model);
             }
 
+            // Kullanıcı ID'sini Claims'den al
+            var kullaniciIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(kullaniciIdStr) || !int.TryParse(kullaniciIdStr, out int kullaniciId))
+            {
+                ModelState.AddModelError("", "Kullanıcı kimliği bulunamadı. Lütfen tekrar giriş yapın.");
+                return View(model);
+            }
+
             var dto = new SifreDegistirDto
             {
+                KullaniciId = kullaniciId,
                 Email = model.Email,
                 YeniSifre = model.YeniSifre
             };
 
-            var sonuc = await _kullaniciService.SifreDegistirAsync(dto);
+            // API'ya HTTP isteği gönder
+            var client = _httpClientFactory.CreateClient();
+            var json = JsonConvert.SerializeObject(dto);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("https://localhost:7040/api/Kullanicilar/sifre-degistir", content);
 
-            if (sonuc.Basarili)
+            if (response.IsSuccessStatusCode)
             {
-                TempData["Basarili"] = "Şifreniz başarıyla güncellendi.";
+                TempData["Basarili"] = "Şifre başarıyla değiştirildi.";
                 return RedirectToAction("Anasayfa", "Home");
             }
-
-            ModelState.AddModelError("", sonuc.Mesaj ?? "Şifre değiştirme işlemi başarısız oldu.");
-            return View(model);
-        }
-        
-        [HttpPost]
-        public async Task<IActionResult> Cikis()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Giris");
+            else
+            {
+                var hata = await response.Content.ReadAsStringAsync();
+                dynamic hataObj = JsonConvert.DeserializeObject(hata);
+                string mesaj = hataObj?.mesaj ?? hata;
+                ModelState.AddModelError("", mesaj);
+                return View(model);
+            }
         }
     }
 }
