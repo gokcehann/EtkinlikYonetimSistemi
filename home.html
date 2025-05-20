@@ -6,12 +6,20 @@
     <title>Biletika - Ana Sayfa</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style type="text/css"></style>
 </head>
 <body class="home-page">
     <nav class="navbar">
         <a href="home.html" class="navbar-logo">Biletika</a>
-        <div class="nav-right">
-            <a href="#" class="nav-link"><i class="fas fa-user"></i></a>
+        <div class="nav-right" style="position: relative;">
+            <a href="#" class="nav-link" id="userIcon" onclick="toggleUserPanel(event)"><i class="fas fa-user"></i></a>
+            <div id="userPanel" class="user-panel-dropdown" style="display: none; position: absolute; top: 40px; right: 40px; z-index: 1001;">
+                <div class="user-panel-box">
+                    <div class="user-panel-title">Kullanıcı Bilgileri</div>
+                    <div id="userDetails" class="user-panel-details"></div>
+                    <button onclick="logout()" class="user-panel-logout">Çıkış Yap</button>
+                </div>
+            </div>
             <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i></a>
         </div>
     </nav>
@@ -99,6 +107,54 @@
             </div>
         </div>
     </footer>
+
+    <style>
+        .user-panel-dropdown {
+            min-width: 280px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            padding: 0;
+            font-size: 15px;
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            z-index: 1001;
+        }
+        .user-panel-box {
+            padding: 18px 18px 12px 18px;
+        }
+        .user-panel-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 17px;
+            color: #333;
+        }
+        .user-panel-details p {
+            margin: 3px 0;
+            color: #444;
+            font-size: 15px;
+        }
+        .user-panel-details strong {
+            color: #888;
+            font-weight: 500;
+        }
+        .user-panel-logout {
+            width: 100%;
+            margin-top: 12px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 0;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-panel-logout:hover {
+            background: #b52a37;
+        }
+    </style>
 
     <script>
         // Örnek etkinlik verileri (gerçek uygulamada bu veriler bir API'den gelecek)
@@ -217,7 +273,7 @@
                     hasEvents = true;
                     const eventCard = `
                         <div class="event-card">
-                            <img src="https://via.placeholder.com/300x200" alt="${event.interest}">
+                            <img src="${event.image}" alt="${event.interest}">
                             <div class="event-info">
                                 <h3>${event.interest}</h3>
                                 <p>${event.date}</p>
@@ -247,6 +303,46 @@
             localStorage.setItem('cart', JSON.stringify(cart));
             alert('Etkinlik sepete eklendi!');
         }
+
+        // Kullanıcı paneli fonksiyonları
+        function toggleUserPanel(event) {
+            event.preventDefault();
+            const panel = document.getElementById('userPanel');
+            panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+            if (panel.style.display === 'block') {
+                loadUserInfo();
+                document.addEventListener('mousedown', closePanelOnClickOutside);
+            } else {
+                document.removeEventListener('mousedown', closePanelOnClickOutside);
+            }
+        }
+        function closePanelOnClickOutside(e) {
+            const panel = document.getElementById('userPanel');
+            const icon = document.getElementById('userIcon');
+            if (!panel.contains(e.target) && !icon.contains(e.target)) {
+                panel.style.display = 'none';
+                document.removeEventListener('mousedown', closePanelOnClickOutside);
+            }
+        }
+        function loadUserInfo() {
+            const userDetails = document.getElementById('userDetails');
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            let html = `
+                <p><strong>Ad:</strong> ${userInfo?.firstName || 'Belirtilmemiş'}</p>
+                <p><strong>Soyad:</strong> ${userInfo?.lastName || 'Belirtilmemiş'}</p>
+                <p><strong>E-posta:</strong> ${userInfo?.email || 'Belirtilmemiş'}</p>
+            `;
+            if (userInfo && (userInfo.isAdmin === true || userInfo.role === 'admin')) {
+                html += `<p style="margin-top:8px;color:#e6b800;font-weight:bold;"><i class='fas fa-star' style='color:#e6b800;margin-right:4px;'></i>Admin</p>`;
+            }
+            userDetails.innerHTML = html;
+        }
+        function logout() {
+            localStorage.removeItem('userInfo');
+            loadUserInfo();
+            document.getElementById('userPanel').style.display = 'none';
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
-</html>  kategorili hali
+</html> 
