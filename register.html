@@ -8,26 +8,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <video id="bg-video" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;"><source src="media/26344-357839084.mp4" type="video/mp4"></video>
     <nav class="navbar">
         <a href="index.html" class="navbar-logo">Biletika</a>
     </nav>
 
     <div class="container">
-        <div class="video-section">
-            <div class="baslik">
-                Biletika
+        <div class="video-section" style="display:flex;align-items:center;justify-content:flex-start;padding:20px;">
+            <div style="flex:1;text-align:left;">
+                <div class="baslik" style="color: white;">Biletika</div>
+                <div class="promotion-text">
+                    <h2 style="color: white;">Biletika'ya Üye Ol!</h2>
+                    <p style="color: white;">İlgi alanlarını seç ve biletini satın al</p>
+                </div>
             </div>
-            <div class="promotion-text">
-                <h2>Biletika'ya Üye Ol!</h2>
-                <p>İlgi alanlarını seç ve biletini satın al</p>
-            </div>
-            <video autoplay muted loop>
-                <source src="media/26344-357839084.mp4" type="video/mp4">
-            </video>
         </div>
        
-        <div class="interests-section">
-            <h2>İlgi Alanlarını Seç</h2>
+        <div class="interests-section" style="background:transparent;padding:20px;">
+            <h2 style="color: white;text-align:center;font-size:28px;margin-bottom:20px;">İlgi Alanlarını Seç</h2>
             <div class="interests-grid">
                 <button class="interest-btn" data-interest="Teknoloji">Teknoloji</button>
                 <button class="interest-btn" data-interest="Tiyatro">Tiyatro</button>
@@ -46,9 +44,9 @@
             </div>
         </div>
 
-        <div class="form-section">
-            <form id="registerForm" onsubmit="handleRegister(event)">
-                <h1>Kayıt Ol</h1>
+        <div class="form-section" style="background:transparent;padding:20px;">
+            <form id="registerForm" onsubmit="handleRegister(event)" style="max-width:300px;margin:0 auto;">
+                <h1 style="color: white;text-align:center;">Kayıt Ol</h1>
                 <div class="form-group">
                     <input type="text" id="name" placeholder="Ad" required>
                 </div>
