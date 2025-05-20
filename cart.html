@@ -273,9 +273,34 @@
             <form id="paymentForm">
                 <div class="payment-options">
                     <label><input type="radio" name="payment" value="Kredi Kartı" required> Kredi Kartı</label>
-                    <label><input type="radio" name="payment" value="Kapıda Ödeme"> Kapıda Ödeme</label>
+                    <label><input type="radio" name="payment" value="Havale/EFT"> Havale/EFT</label>
                 </div>
-                <button type="submit" class="payment-btn">Onayla</button>
+                <div id="creditCardFields" style="display:none;">
+                    <div style="display:flex;gap:10px;margin-bottom:10px;">
+                        <input type="text" id="firstname" placeholder="Ad" required style="flex:1;padding:10px;">
+                        <input type="text" id="lastname" placeholder="Soyad" required style="flex:1;padding:10px;">
+                    </div>
+                    <div style="display:flex;gap:10px;margin-bottom:10px;">
+                        <input type="text" id="cardnumber" placeholder="Kart Numarası" maxlength="19" required style="width:100%;padding:10px;">
+                    </div>
+                    <div style="display:flex;gap:10px;margin-bottom:10px;">
+                        <input type="text" id="expdate" placeholder="AA/YY" maxlength="5" required style="flex:1;padding:10px;">
+                        <input type="text" id="cvv" placeholder="CVV" maxlength="3" required style="flex:1;padding:10px;">
+                    </div>
+                </div>
+                <div id="bankFields" style="display:none;">
+                    <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px;">
+                        <h3 style="margin-bottom:15px; color:#333;">Banka Hesap Bilgileri</h3>
+                        <p style="margin:5px 0;"><strong>Banka:</strong> Garanti Bankası</p>
+                        <p style="margin:5px 0;"><strong>IBAN:</strong> TR12 3456 7890 1234 5678 9012 34</p>
+                        <p style="margin:5px 0;"><strong>Hesap Sahibi:</strong> Biletika A.Ş.</p>
+                        <p style="margin:5px 0;"><strong>Açıklama:</strong> Bilet ödemesi</p>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <p style="color:#666; font-size:14px;">* Havale/EFT sonrası biletleriniz otomatik olarak hesabınıza tanımlanacaktır.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="completePayment()" class="payment-btn" style="background:#1877f2;width:100%;font-size:18px;margin-top:20px;">Ödemeyi Tamamla</button>
             </form>
         </div>
     </div>
@@ -406,18 +431,47 @@
         function closePaymentModal() {
             document.getElementById('paymentModal').classList.remove('active');
         }
-        document.getElementById('paymentForm').onsubmit = function(e) {
-            e.preventDefault();
+
+        // Ödeme yöntemi seçildiğinde form alanlarını göster/gizle
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentRadios = document.querySelectorAll('input[name="payment"]');
+            paymentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const creditCardFields = document.getElementById('creditCardFields');
+                    const bankFields = document.getElementById('bankFields');
+                    if (this.value === 'Kredi Kartı') {
+                        creditCardFields.style.display = 'block';
+                        bankFields.style.display = 'none';
+                    } else if (this.value === 'Havale/EFT') {
+                        creditCardFields.style.display = 'none';
+                        bankFields.style.display = 'block';
+                    }
+                });
+            });
+        });
+
+        // Ödeme tamamlama fonksiyonu
+        function completePayment() {
             const method = document.querySelector('input[name="payment"]:checked').value;
             closePaymentModal();
             // Sepeti boşalt
             localStorage.setItem('cart', '[]');
             // Sepet içeriğini temizle ve başarı mesajı göster
-            document.querySelector('.cart-container').innerHTML = '<div class="payment-success">Ödeme başarıyla tamamlandı<br><span style="font-size:16px;color:#333;">Anasayfaya yönlendiriliyorsunuz...</span></div>';
-            setTimeout(function() {
-                window.location.href = "home.html";
-            }, 3000);
-        };
+            let successMessage = method === 'Havale/EFT' 
+                ? 'Havale/EFT talimatları gönderildi' 
+                : 'Ödeme başarıyla tamamlandı';
+            
+            document.querySelector('.cart-container').innerHTML = `
+                <div class="payment-success">
+                    <div>${successMessage}</div>
+                    <div style="margin-top: 10px; font-size: 16px; color: #666;">Ana sayfaya yönlendiriliyorsunuz...</div>
+                </div>
+            `;
+            // 2 saniye sonra ana sayfaya yönlendir
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 2000);
+        }
     </script>
 </body>
 </html> 
