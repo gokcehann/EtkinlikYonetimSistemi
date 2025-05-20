@@ -74,5 +74,12 @@ namespace EtkinlikYonetimSistemi.API.Controllers
 
             return Ok("Şifre başarıyla değiştirildi.");
         }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> OnaysizKullanicilar()
+        {
+            var onaysizlar = await _kullaniciService.GetOnaysizKullanicilarAsync();
+            return View(onaysizlar);
+        }
     }
 }

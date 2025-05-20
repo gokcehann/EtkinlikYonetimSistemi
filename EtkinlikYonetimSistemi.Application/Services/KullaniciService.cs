@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace EtkinlikYonetimSistemi.Application.Services
 {
@@ -119,11 +120,6 @@ namespace EtkinlikYonetimSistemi.Application.Services
                     return new GirisDto { Basarili = false, Mesaj = "Şifre yanlış." };
                 }
 
-                if (!kullanici.OnayliMi)
-                {
-                    return new GirisDto { Basarili = false, Mesaj = "Hesabınız henüz onaylanmamış." };
-                }
-
                 kullanici.LoginSayisi++;
                 await _kullaniciRepository.UpdateAsync(kullanici);
 
@@ -184,6 +180,22 @@ namespace EtkinlikYonetimSistemi.Application.Services
                 _logger.LogError(ex, "Şifre değiştirme işlemi sırasında bir hata oluştu.");
                 return new SifreDegistirSonucDto { Basarili = false, Mesaj = "Şifre değiştirme işlemi sırasında bir hata oluştu." };
             }
+        }
+
+        public async Task KullaniciOnaylaAsync(int id)
+        {
+            var kullanici = await _kullaniciRepository.GetByIdAsync(id);
+            if (kullanici != null)
+            {
+                kullanici.OnayliMi = true;
+                await _kullaniciRepository.UpdateAsync(kullanici);
+            }
+        }
+
+        public async Task<List<Kullanici>> GetOnaysizKullanicilarAsync()
+        {
+            var tumKullanicilar = await _kullaniciRepository.GetAllAsync();
+            return tumKullanicilar.Where(x => !x.OnayliMi).ToList();
         }
     }
 }
