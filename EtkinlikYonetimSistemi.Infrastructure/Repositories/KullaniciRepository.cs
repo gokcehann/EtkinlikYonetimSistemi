@@ -8,6 +8,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
     public class KullaniciRepository : IKullaniciRepository
     {
         private readonly EventDbContext _context;
+        
         public KullaniciRepository(EventDbContext context)
         {
             _context = context;
@@ -19,7 +20,6 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
             return await _context.Kullanicilar
                 .Include(k => k.IlgiAlanlari)
                 .FirstOrDefaultAsync(k => k.Id == id);
-
         }
 
         /// Belirtilen email adresine sahip kullanÄ±cÄ±yÄ± ve iliÅŸkili ilgi alanlarÄ±nÄ± getirir.

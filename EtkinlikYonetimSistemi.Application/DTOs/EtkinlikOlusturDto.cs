@@ -20,9 +20,11 @@ namespace EtkinlikYonetimSistemi.Application.DTOs
         [Required(ErrorMessage = "Kategori ID zorunludur")]
         public int KategoriId { get; set; }
 
-        [Required(ErrorMessage = "Bilet fiyatı zorunludur")]
-        [Range(0, double.MaxValue, ErrorMessage = "Bilet fiyatı 0'dan büyük olmalıdır")]
-        public decimal BiletFiyati { get; set; }
+        [Required(ErrorMessage = "Şehir zorunludur")]
+        public string Sehir { get; set; }
+
+        public bool PlanlanabilirMi { get; set; }
+        public string PlanlamaMesaji { get; set; }
     }
 
     public class EtkinlikSonucDto
@@ -37,8 +39,11 @@ namespace EtkinlikYonetimSistemi.Application.DTOs
         public string KategoriAdi { get; set; }
         public decimal BiletFiyati { get; set; }
         public HavaDurumuDto HavaDurumu { get; set; }
+        public string Sehir { get; set; }
         public bool Basarili { get; set; }
         public string Mesaj { get; set; } = string.Empty;
         public int Id { get; set; }
+        public bool PlanlanabilirMi { get; set; }
+        public string PlanlamaMesaji { get; set; }
     }
 }

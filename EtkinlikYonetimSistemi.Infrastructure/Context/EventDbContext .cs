@@ -35,6 +35,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Context
         public DbSet<SatinAlim> SatinAlimlar { get; set; }
         public DbSet<SatinAlimBileti> SatinAlimBiletleri { get; set; }
         public DbSet<IlgiAlani> IlgiAlanlari { get; set; }
+        public DbSet<Duyuru> Duyurular { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

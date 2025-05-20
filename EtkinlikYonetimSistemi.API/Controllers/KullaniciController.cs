@@ -19,13 +19,24 @@ namespace EtkinlikYonetimSistemi.API.Controllers
         [HttpPost("kayit")]
         public async Task<IActionResult> KayitOl([FromBody] KullaniciKayitDto dto)
         {
-
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage).ToList();
 
                 return BadRequest(new { Basarili = false, Mesaj = string.Join(" | ", errors) });
+            }
+
+            // Admin kontrolü
+            if (dto.Email.ToLower() == "admin@gmail.com")
+            {
+                dto.Rol = "Admin";
+                dto.OnayliMi = true;
+            }
+            else
+            {
+                dto.Rol = "Kullanici";
+                dto.OnayliMi = false;
             }
 
             var sonuc = await _kullaniciService.KayitOlAsync(dto);
@@ -35,7 +46,6 @@ namespace EtkinlikYonetimSistemi.API.Controllers
                 return BadRequest(sonuc);
             }
 
-            Console.WriteLine($"Gelen Kullanıcı: {dto.Email} - {dto.Sifre}");
             return Ok(sonuc);
         }
 
@@ -64,6 +74,5 @@ namespace EtkinlikYonetimSistemi.API.Controllers
 
             return Ok("Şifre başarıyla değiştirildi.");
         }
-
     }
 }

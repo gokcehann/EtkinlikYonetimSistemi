@@ -22,6 +22,9 @@ namespace EtkinlikYonetimSistemi.Application.DTOs
         [Required(ErrorMessage = "Kategori ID zorunludur")]
         public int KategoriId { get; set; }
 
+        [Required(ErrorMessage = "Şehir zorunludur")]
+        public string Sehir { get; set; }
+
         [Required(ErrorMessage = "Bilet fiyatı zorunludur")]
         [Range(0, double.MaxValue, ErrorMessage = "Bilet fiyatı 0'dan büyük olmalıdır")]
         public decimal BiletFiyati { get; set; }

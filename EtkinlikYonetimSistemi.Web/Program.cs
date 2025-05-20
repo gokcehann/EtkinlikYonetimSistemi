@@ -1,4 +1,5 @@
 using EtkinlikYonetimSistemi.Application.Interfaces;
+using EtkinlikYonetimSistemi.Application.Services;
 using EtkinlikYonetimSistemi.Domain.Entities;
 using EtkinlikYonetimSistemi.Infrastructure.Context;
 using EtkinlikYonetimSistemi.Infrastructure.Repositories;

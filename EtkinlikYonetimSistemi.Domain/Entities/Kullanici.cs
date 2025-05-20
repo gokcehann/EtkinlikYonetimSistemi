@@ -1,4 +1,6 @@
-﻿namespace EtkinlikYonetimSistemi.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EtkinlikYonetimSistemi.Domain.Entities
 {
     public class Kullanici
     {
@@ -9,7 +11,7 @@
         public required string SifreHash { get; set; }
         public bool OnayliMi { get; set; }
         public int LoginSayisi { get; set; } // Kullanıcının giriş sayısını takip eder
-        public required string Rol { get; set; } // admin , kullanici 
+        public required string Rol { get; set; } // "Admin" veya "Kullanici"
 
         // İlişkiler
         public ICollection<Sepet> Sepetler { get; set; }  //İleride kullanıcıların aldıkları tüm biletleri/sepetleri görebilmek için.

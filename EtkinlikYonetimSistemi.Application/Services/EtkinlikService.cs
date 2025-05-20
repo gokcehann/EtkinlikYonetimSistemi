@@ -28,7 +28,8 @@ namespace EtkinlikYonetimSistemi.Application.Services
             foreach (var etkinlik in etkinlikler)
             {
                 var dto = MapToDto(etkinlik);
-                dto.HavaDurumu = await _havaDurumuService.GetHavaDurumuAsync(etkinlik.Tarih, "Istanbul"); // Varsayılan olarak İstanbul
+                dto.HavaDurumu = await _havaDurumuService.GetHavaDurumuAsync(etkinlik.Tarih, etkinlik.Sehir);
+                KontrolEtkinlikPlanlanabilirligi(dto);
                 etkinlikDtos.Add(dto);
             }
 
@@ -42,7 +43,8 @@ namespace EtkinlikYonetimSistemi.Application.Services
                 return new EtkinlikSonucDto { Basarili = false, Mesaj = "Etkinlik bulunamadı." };
 
             var dto = MapToDto(etkinlik);
-            dto.HavaDurumu = await _havaDurumuService.GetHavaDurumuAsync(etkinlik.Tarih, "Istanbul"); // Varsayılan olarak İstanbul
+            dto.HavaDurumu = await _havaDurumuService.GetHavaDurumuAsync(etkinlik.Tarih, etkinlik.Sehir);
+            KontrolEtkinlikPlanlanabilirligi(dto);
             return dto;
         }
 
@@ -54,11 +56,42 @@ namespace EtkinlikYonetimSistemi.Application.Services
             foreach (var etkinlik in etkinlikler)
             {
                 var dto = MapToDto(etkinlik);
-                dto.HavaDurumu = await _havaDurumuService.GetHavaDurumuAsync(etkinlik.Tarih, "Istanbul"); // Varsayılan olarak İstanbul
+                dto.HavaDurumu = await _havaDurumuService.GetHavaDurumuAsync(etkinlik.Tarih, etkinlik.Sehir);
+                KontrolEtkinlikPlanlanabilirligi(dto);
                 etkinlikDtos.Add(dto);
             }
 
             return etkinlikDtos;
+        }
+
+        private void KontrolEtkinlikPlanlanabilirligi(EtkinlikSonucDto dto)
+        {
+            if (dto.HavaDurumu == null)
+            {
+                dto.PlanlanabilirMi = true;
+                dto.PlanlamaMesaji = $"Hava durumu bilgisi alınamadı, etkinlik planlanabilir. Şehir: {dto.Sehir}";
+                return;
+            }
+
+            var olumsuzHavaKosullari = new[]
+            {
+                "Yağmurlu",
+                "Sağanak Yağışlı",
+                "Gök Gürültülü Fırtına",
+                "Dolu ile Gök Gürültülü Fırtına",
+                "Kar Yağışlı"
+            };
+
+            if (olumsuzHavaKosullari.Contains(dto.HavaDurumu.Durum) || dto.HavaDurumu.Sicaklik < -5)
+            {
+                dto.PlanlanabilirMi = false;
+                dto.PlanlamaMesaji = $"{dto.Sehir} için hava koşulları uygun değil: {dto.HavaDurumu.Durum}, Sıcaklık: {dto.HavaDurumu.Sicaklik}°C";
+            }
+            else
+            {
+                dto.PlanlanabilirMi = true;
+                dto.PlanlamaMesaji = $"{dto.Sehir} için hava koşulları uygun: {dto.HavaDurumu.Durum}, Sıcaklık: {dto.HavaDurumu.Sicaklik}°C";
+            }
         }
 
         private EtkinlikSonucDto MapToDto(Etkinlik etkinlik)
@@ -74,33 +107,75 @@ namespace EtkinlikYonetimSistemi.Application.Services
                 KategoriId = etkinlik.KategoriId,
                 KategoriAdi = etkinlik.IlgiAlani?.Ad,
                 BiletFiyati = etkinlik.Biletler.FirstOrDefault()?.Fiyat ?? 0,
+                Sehir = etkinlik.Sehir,
                 Basarili = true
             };
         }
 
         public async Task<EtkinlikSonucDto> CreateAsync(EtkinlikOlusturDto dto)
         {
-            var kategori = await _ilgiAlaniRepository.GetByIdAsync(dto.KategoriId);
-            if (kategori == null)
-                return new EtkinlikSonucDto { Basarili = false, Mesaj = "Kategori bulunamadı." };
-
-            var etkinlik = new Etkinlik
+            try
             {
-                Ad = dto.Ad,
-                Aciklama = dto.Aciklama,
-                Tarih = dto.Tarih,
-                Kapasite = dto.Kapasite,
-                KalanBilet = dto.Kapasite,
-                KategoriId = dto.KategoriId,
+                var kategori = await _ilgiAlaniRepository.GetByIdAsync(dto.KategoriId);
+                if (kategori == null)
+                    return new EtkinlikSonucDto { Basarili = false, Mesaj = "Kategori bulunamadı." };
 
-                Biletler = new List<Bilet>
+                // Eğer alt kategori ise, üst kategorinin fiyatını al
+                decimal biletFiyati = kategori.BasePrice;
+                if (!kategori.AnaKategoriMi && kategori.UstKategoriId.HasValue)
                 {
-
+                    var ustKategori = await _ilgiAlaniRepository.GetByIdAsync(kategori.UstKategoriId.Value);
+                    if (ustKategori != null)
+                    {
+                        biletFiyati = ustKategori.BasePrice;
+                    }
                 }
-            };
 
-            await _etkinlikRepository.AddAsync(etkinlik);
-            return new EtkinlikSonucDto { Basarili = true, Mesaj = "Etkinlik başarıyla oluşturuldu.", Id = etkinlik.EtkinlikId };
+                var etkinlik = new Etkinlik
+                {
+                    Ad = dto.Ad,
+                    Aciklama = dto.Aciklama,
+                    Tarih = dto.Tarih,
+                    Kapasite = dto.Kapasite,
+                    KalanBilet = dto.Kapasite,
+                    KategoriId = dto.KategoriId,
+                    Sehir = dto.Sehir,
+                    BiletFiyati = biletFiyati,
+                    Biletler = new List<Bilet>
+                    {
+                        new Bilet
+                        {
+                            Fiyat = biletFiyati,
+                            StokAdedi = dto.Kapasite
+                        }
+                    }
+                };
+
+                await _etkinlikRepository.AddAsync(etkinlik);
+                
+                return new EtkinlikSonucDto 
+                { 
+                    Basarili = true, 
+                    Mesaj = "Etkinlik başarıyla oluşturuldu.", 
+                    Id = etkinlik.EtkinlikId,
+                    Ad = etkinlik.Ad,
+                    Aciklama = etkinlik.Aciklama,
+                    Tarih = etkinlik.Tarih,
+                    Kapasite = etkinlik.Kapasite,
+                    KalanBilet = etkinlik.KalanBilet,
+                    KategoriId = etkinlik.KategoriId,
+                    BiletFiyati = etkinlik.BiletFiyati,
+                    Sehir = etkinlik.Sehir
+                };
+            }
+            catch (Exception ex)
+            {
+                return new EtkinlikSonucDto 
+                { 
+                    Basarili = false, 
+                    Mesaj = $"Etkinlik oluşturulurken bir hata oluştu: {ex.Message}" 
+                };
+            }
         }
 
         public async Task<EtkinlikSonucDto> UpdateAsync(EtkinlikGuncelleDto dto)
@@ -118,6 +193,7 @@ namespace EtkinlikYonetimSistemi.Application.Services
             etkinlik.Tarih = dto.Tarih;
             etkinlik.Kapasite = dto.Kapasite;
             etkinlik.KategoriId = dto.KategoriId;
+            etkinlik.Sehir = dto.Sehir;
 
             var bilet = etkinlik.Biletler.FirstOrDefault();
             if (bilet != null)

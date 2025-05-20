@@ -18,6 +18,8 @@ namespace EtkinlikYonetimSistemi.Application.DTOs
 
         [Required(ErrorMessage = "İlgi alanı seçmek zorunludur.")]
         public required List<int> IlgiAlaniIdleri { get; set; }
+        public string Rol { get; set; }
+        public bool OnayliMi { get; set; }
     }
 
     public class KayitDto

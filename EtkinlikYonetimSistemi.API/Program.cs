@@ -1,4 +1,5 @@
 ﻿using EtkinlikYonetimSistemi.Application.Interfaces;
+using EtkinlikYonetimSistemi.Application.Services;
 using EtkinlikYonetimSistemi.Domain.Entities;
 using EtkinlikYonetimSistemi.Infrastructure.Context;
 using EtkinlikYonetimSistemi.Infrastructure.Repositories;
@@ -21,6 +22,12 @@ builder.Services.AddScoped<IKullaniciRepository, KullaniciRepository>();
 builder.Services.AddScoped<IKullaniciService, KullaniciService>();
 builder.Services.AddScoped<IIlgiAlaniRepository, IlgiAlaniRepository>();
 builder.Services.AddScoped<IPasswordHasher<Kullanici>, PasswordHasher<Kullanici>>();
+builder.Services.AddScoped<IDuyuruRepository, DuyuruRepository>();
+builder.Services.AddScoped<IDuyuruService, DuyuruService>();
+builder.Services.AddHttpClient<IHavaDurumuService, HavaDurumuService>();
+builder.Services.AddScoped<IHavaDurumuService, HavaDurumuService>();
+builder.Services.AddScoped<IEtkinlikRepository, EtkinlikRepository>();
+builder.Services.AddScoped<IEtkinlikService, EtkinlikService>();
 
 // 3. JWT Ayarları
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -34,8 +41,6 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = true;
-    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -109,7 +114,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors("AllowAll"); // CORS middleware'i JWT'den önce eklenmelidir
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

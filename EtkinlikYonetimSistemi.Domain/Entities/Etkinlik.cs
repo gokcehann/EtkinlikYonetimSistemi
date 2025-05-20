@@ -1,4 +1,6 @@
-﻿namespace EtkinlikYonetimSistemi.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EtkinlikYonetimSistemi.Domain.Entities
 {
     public class Etkinlik
     {
@@ -9,6 +11,7 @@
         public int Kapasite { get; set; }
         public int KalanBilet { get; set; }
         public int KategoriId { get; set; }
+        public string Sehir { get; set; }
         public decimal BiletFiyati { get; set; }
 
         // Navigation properties  

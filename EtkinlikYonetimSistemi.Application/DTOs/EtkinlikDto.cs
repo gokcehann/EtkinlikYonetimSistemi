@@ -12,5 +12,8 @@ namespace EtkinlikYonetimSistemi.Application.DTOs
         public string KategoriAdi { get; set; }
         public decimal BiletFiyati { get; set; }
         public HavaDurumuDto HavaDurumu { get; set; }
+        public string Sehir { get; set; }
+        public bool PlanlanabilirMi { get; set; }
+        public string PlanlamaMesaji { get; set; }
     }
 }

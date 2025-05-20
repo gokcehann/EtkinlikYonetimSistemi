@@ -4,6 +4,8 @@ using EtkinlikYonetimSistemi.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using Microsoft.Extensions.Logging;
+using EtkinlikYonetimSistemi.Application.Services;
 
 namespace EtkinlikYonetimSistemi.Tests.Services
 {
@@ -12,11 +14,12 @@ namespace EtkinlikYonetimSistemi.Tests.Services
         private readonly Mock<IKullaniciRepository> _mockKullaniciRepo = new();
         private readonly Mock<IIlgiAlaniRepository> _mockIlgiAlaniRepo = new();
         private readonly Mock<IConfiguration> _mockConfig = new();
+        private readonly Mock<ILogger<KullaniciService>> _mockLogger = new();
         private readonly KullaniciService _service;
 
         public KullaniciServiceTests()
         {
-            _service = new KullaniciService(_mockKullaniciRepo.Object, _mockIlgiAlaniRepo.Object, _mockConfig.Object);
+            _service = new KullaniciService(_mockKullaniciRepo.Object, _mockIlgiAlaniRepo.Object, _mockConfig.Object, _mockLogger.Object);
         }
 
         [Fact]

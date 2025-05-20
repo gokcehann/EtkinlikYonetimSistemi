@@ -54,13 +54,12 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
         [HttpGet]
         public IActionResult Giris()
         {
-            var model = new GirisViewModel();
-            return View(model);
+            return View(new GirisViewModel());
         }
 
         // POST: /Kullanici/Giris
         [HttpPost]
-        public async Task<IActionResult> Giris(GirisViewModel dto)
+        public async Task<IActionResult> Giris(GirisViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -74,51 +73,30 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
                 return View(model);
             }
 
-                // JWT Token'ı cookie'ye yaz (Güvenlik için Secure ve SameSite ayarlarını yap)
-                Response.Cookies.Append("jwtToken", sonuc.Token?.ToString() ?? string.Empty, new CookieOptions
+            // Kullanıcı kimlik bilgilerini oluştur
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, model.Email),
+                new Claim(ClaimTypes.Role, "Kullanici")
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                new AuthenticationProperties
                 {
-                    HttpOnly = true,
-                    Secure = true, // https zorunluysa true, değilse false olabilir
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.Now.AddMinutes(30)
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
-                // Kullanıcı bilgilerini Claims ile ASP.NET'e tanıt
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, sonuc.Email),
-                    new Claim(ClaimTypes.NameIdentifier, sonuc.KullaniciId.ToString()),
-                    new Claim(ClaimTypes.Role, sonuc.Rol ?? "Kullanici")
-                };
-
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                    new AuthenticationProperties
-                    {
-                        IsPersistent = true,
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-                    });
-
-                // loginSayisi 0'dan büyükse anasayfaya, 0 ise şifre yenileme sayfasına yönlendir
-                if (sonuc.LoginSayisi > 0)
-                {
-                    return RedirectToAction("Anasayfa", "Kullanici");
-                }
-                else
-                {
-                    return RedirectToAction("SifreYenileme", "Kullanici");
-                }
-            }
-            else
+            if (sonuc.SifreYenilemeGerekli)
             {
-                var hata = await response.Content.ReadAsStringAsync();
-                dynamic hataObj = JsonConvert.DeserializeObject(hata);
-                string mesaj = hataObj?.mesaj ?? hata;
-                ViewBag.Hata = "Giriş başarısız: " + mesaj;
-                return View(dto);
+                return RedirectToAction("SifreYenileme", "Kullanici");
             }
+
+            return RedirectToAction("Anasayfa", "Home");
         }
 
         [HttpGet]
@@ -126,7 +104,6 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> SifreYenileme(SifreYenilemeViewModel model)
         {
@@ -139,40 +116,29 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
                 return View(model);
             }
 
-            // Kullanıcı ID'sini Claims'den al
-            var kullaniciIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(kullaniciIdStr) || !int.TryParse(kullaniciIdStr, out int kullaniciId))
-            {
-                ModelState.AddModelError("", "Kullanıcı kimliği bulunamadı. Lütfen tekrar giriş yapın.");
-                return View(model);
-            }
-
             var dto = new SifreDegistirDto
             {
-                KullaniciId = kullaniciId,
                 Email = model.Email,
                 YeniSifre = model.YeniSifre
             };
 
-            // API'ya HTTP isteği gönder
-            var client = _httpClientFactory.CreateClient();
-            var json = JsonConvert.SerializeObject(dto);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("https://localhost:7040/api/Kullanicilar/sifre-degistir", content);
+            var sonuc = await _kullaniciService.SifreDegistirAsync(dto);
 
-            if (response.IsSuccessStatusCode)
+            if (sonuc.Basarili)
             {
-                TempData["Basarili"] = "Şifre başarıyla değiştirildi.";
+                TempData["Basarili"] = "Şifreniz başarıyla güncellendi.";
                 return RedirectToAction("Anasayfa", "Home");
             }
-            else
-            {
-                var hata = await response.Content.ReadAsStringAsync();
-                dynamic hataObj = JsonConvert.DeserializeObject(hata);
-                string mesaj = hataObj?.mesaj ?? hata;
-                ModelState.AddModelError("", mesaj);
-                return View(model);
-            }
+
+            ModelState.AddModelError("", sonuc.Mesaj ?? "Şifre değiştirme işlemi başarısız oldu.");
+            return View(model);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Cikis()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Giris");
         }
     }
 }

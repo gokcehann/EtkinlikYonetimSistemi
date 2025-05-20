@@ -19,6 +19,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
             return await _context.Etkinlikler
                 .Include(e => e.IlgiAlani)
                 .Include(e => e.Biletler)
+                .OrderBy(e => e.Tarih)
                 .ToListAsync();
         }
 
