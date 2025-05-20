@@ -1,34 +1,202 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model EtkinlikYonetimSistemi.Web.Models.GirisViewModel
 @{
-    ViewBag.Title = "Giriş Yap";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 }
 
-<div class="container">
-    <div class="baslik">
-        Biletika
-    </div>
-    <div class="promotion-text">
-        <h2>Biletika'ya Üye Ol!</h2>
-        <p>Üyeliğin ardından biletini satın al</p>
-    </div>
-    <video autoplay muted loop>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biletika - Giriş Yap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.4);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #000000;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 100px;
+        }
+
+        .left-side {
+            max-width: 600px;
+        }
+
+        .site-title {
+            font-family: monospace;
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 48px;
+            margin: 0 0 20px 0;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .right-side {
+            width: 400px;
+            padding: 0;
+        }
+
+        .login-container {
+            text-align: center;
+        }
+
+        .user-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        .txt {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .signin-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #4285f4;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .signin-btn:hover {
+            background: #3367d6;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            box-sizing: border-box;
+            transition: background 0.3s;
+        }
+
+        .signup-btn:hover {
+            background: #333;
+        }
+
+        .text-danger {
+            color: #ff4444;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <video id="bg-video" autoplay muted loop playsinline>
         <source src="~/media/26344-357839084.mp4" type="video/mp4">
     </video>
-</div>
 
-<div class="signup-form">
-    @using (Html.BeginForm("Giris", "Kullanici", FormMethod.Post, new { @id = "loginForm" }))
-    {
-        <h1><i class="fas fa-user"></i> Giriş Yap</h1>
-        @Html.TextBoxFor(m => m.Email, new { @class = "txt", placeholder = "e-posta", type = "email", required = "required" })
-        @Html.PasswordFor(m => m.Sifre, new { @class = "txt", placeholder = "şifre", required = "required" })
-        <input type="submit" value="Giriş Yap" class="signin-btn" />
-        <a href="@Url.Action("Kayit", "Kullanici")" class="signup-btn">Hesap Oluştur</a>
-        @if (ViewBag.Hata != null)
-        {
-            <div class="text-danger">@ViewBag.Hata</div>
-        }
-    }
-</div>
+    <div class="navbar">
+        <a href="/" class="logo">Biletika</a>
+    </div>
+
+    <div class="container">
+        <div class="left-side">
+            <div class="site-title">Biletika</div>
+            <h1 class="main-title">Biletika'ya Üye Ol!</h1>
+            <p class="subtitle">Üyeliğin ardından biletini satın al</p>
+        </div>
+
+        <div class="right-side">
+            <div class="login-container">
+                <div class="user-icon">
+                    <i class="fas fa-user fa-2x" style="color: #333;"></i>
+                </div>
+                <h2 class="login-title">Giriş Yap</h2>
+                @using (Html.BeginForm("Giris", "Kullanici", FormMethod.Post, new { @id = "loginForm" }))
+                {
+                    @Html.TextBoxFor(m => m.Email, new { @class = "txt", placeholder = "e-posta", type = "email", required = "required" })
+                    @Html.PasswordFor(m => m.Sifre, new { @class = "txt", placeholder = "şifre", required = "required" })
+                    <input type="submit" value="Giriş Yap" class="signin-btn" />
+                    <a href="@Url.Action("Kayit", "Kullanici")" class="signup-btn">Hesap Oluştur</a>
+                    @if (ViewBag.Hata != null)
+                    {
+                        <div class="text-danger">@ViewBag.Hata</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</body>
+</html>
