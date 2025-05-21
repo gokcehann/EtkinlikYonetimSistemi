@@ -7,4 +7,4 @@ namespace EtkinlikYonetimSistemi.Domain.Entities
         public string Icerik { get; set; }
         public DateTime OlusturmaTarihi { get; set; }
     }
-} 
+}

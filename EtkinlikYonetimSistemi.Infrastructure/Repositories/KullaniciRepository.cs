@@ -8,7 +8,7 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
     public class KullaniciRepository : IKullaniciRepository
     {
         private readonly EventDbContext _context;
-        
+
         public KullaniciRepository(EventDbContext context)
         {
             _context = context;

@@ -152,11 +152,11 @@ namespace EtkinlikYonetimSistemi.Application.Services
                 };
 
                 await _etkinlikRepository.AddAsync(etkinlik);
-                
-                return new EtkinlikSonucDto 
-                { 
-                    Basarili = true, 
-                    Mesaj = "Etkinlik başarıyla oluşturuldu.", 
+
+                return new EtkinlikSonucDto
+                {
+                    Basarili = true,
+                    Mesaj = "Etkinlik başarıyla oluşturuldu.",
                     Id = etkinlik.EtkinlikId,
                     Ad = etkinlik.Ad,
                     Aciklama = etkinlik.Aciklama,
@@ -170,10 +170,10 @@ namespace EtkinlikYonetimSistemi.Application.Services
             }
             catch (Exception ex)
             {
-                return new EtkinlikSonucDto 
-                { 
-                    Basarili = false, 
-                    Mesaj = $"Etkinlik oluşturulurken bir hata oluştu: {ex.Message}" 
+                return new EtkinlikSonucDto
+                {
+                    Basarili = false,
+                    Mesaj = $"Etkinlik oluşturulurken bir hata oluştu: {ex.Message}"
                 };
             }
         }
