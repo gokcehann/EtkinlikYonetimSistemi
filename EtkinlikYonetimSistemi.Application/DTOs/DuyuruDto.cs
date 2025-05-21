@@ -20,4 +20,4 @@ namespace EtkinlikYonetimSistemi.Application.DTOs
         public string Baslik { get; set; }
         public string Icerik { get; set; }
     }
-} 
+}

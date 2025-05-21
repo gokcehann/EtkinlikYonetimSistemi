@@ -10,4 +10,4 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
         Task UpdateAsync(Duyuru duyuru);
         Task DeleteAsync(int id);
     }
-} 
+}

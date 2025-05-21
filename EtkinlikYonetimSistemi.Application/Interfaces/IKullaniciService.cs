@@ -1,4 +1,5 @@
 ﻿using EtkinlikYonetimSistemi.Application.DTOs;
+using EtkinlikYonetimSistemi.Domain.Entities;
 
 namespace EtkinlikYonetimSistemi.Application.Interfaces
 {

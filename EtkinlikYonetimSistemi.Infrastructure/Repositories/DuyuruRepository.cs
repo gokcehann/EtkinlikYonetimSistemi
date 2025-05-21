@@ -45,4 +45,4 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Repositories
             }
         }
     }
-} 
+}
