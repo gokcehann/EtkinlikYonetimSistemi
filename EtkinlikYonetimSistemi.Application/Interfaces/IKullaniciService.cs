@@ -11,6 +11,5 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
 
         Task<SifreDegistirSonucDto> SifreDegistirAsync(SifreDegistirDto dto);
 
-        Task<List<Kullanici>> GetOnaysizKullanicilarAsync();
     }
 }

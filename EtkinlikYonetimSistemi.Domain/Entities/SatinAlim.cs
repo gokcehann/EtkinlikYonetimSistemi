@@ -8,6 +8,5 @@
 
         // Navigation properties
         public Kullanici Kullanici { get; set; }
-        public ICollection<SatinAlimBileti> SatinAlimBiletleri { get; set; }
     }
 }

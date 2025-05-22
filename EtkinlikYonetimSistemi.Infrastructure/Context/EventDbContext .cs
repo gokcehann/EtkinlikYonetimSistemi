@@ -33,7 +33,6 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Context
         public DbSet<Sepet> Sepetler { get; set; }
         public DbSet<SepetBileti> SepetBiletleri { get; set; }
         public DbSet<SatinAlim> SatinAlimlar { get; set; }
-        public DbSet<SatinAlimBileti> SatinAlimBiletleri { get; set; }
         public DbSet<IlgiAlani> IlgiAlanlari { get; set; }
         public DbSet<Duyuru> Duyurular { get; set; }
 
@@ -43,9 +42,6 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Context
 
             modelBuilder.Entity<SepetBileti>()
                 .HasKey(sb => new { sb.SepetId, sb.BiletId });
-
-            modelBuilder.Entity<SatinAlimBileti>()
-                .HasKey(sa => new { sa.SatinAlimId, sa.BiletId });
 
             modelBuilder.Entity<Etkinlik>()
                 .HasOne(e => e.IlgiAlani)
@@ -71,16 +67,6 @@ namespace EtkinlikYonetimSistemi.Infrastructure.Context
                 .HasOne(s => s.Kullanici)
                 .WithMany()
                 .HasForeignKey(s => s.Id);
-
-            modelBuilder.Entity<SatinAlimBileti>()
-                .HasOne(sa => sa.SatinAlim)
-                .WithMany(s => s.SatinAlimBiletleri)
-                .HasForeignKey(sa => sa.SatinAlimId);
-
-            modelBuilder.Entity<SatinAlimBileti>()
-                .HasOne(sa => sa.Bilet)
-                .WithMany()
-                .HasForeignKey(sa => sa.BiletId);
 
             modelBuilder.Entity<Kullanici>()
                 .HasMany(k => k.IlgiAlanlari)
