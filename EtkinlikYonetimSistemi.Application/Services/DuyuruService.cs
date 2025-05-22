@@ -79,4 +79,4 @@ namespace EtkinlikYonetimSistemi.Application.Services
             return true;
         }
     }
-}
+} 

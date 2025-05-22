@@ -1,4 +1,6 @@
-﻿namespace EtkinlikYonetimSistemi.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EtkinlikYonetimSistemi.Domain.Entities
 {
     public class Kullanici
     {

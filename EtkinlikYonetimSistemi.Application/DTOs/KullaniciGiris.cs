@@ -1,4 +1,6 @@
-﻿namespace EtkinlikYonetimSistemi.Application.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EtkinlikYonetimSistemi.Application.DTOs
 {
     public class KullaniciGirisDto
     {

@@ -61,4 +61,4 @@ namespace EtkinlikYonetimSistemi.API.Controllers
             return NoContent();
         }
     }
-}
+} 

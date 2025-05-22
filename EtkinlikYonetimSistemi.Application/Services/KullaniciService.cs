@@ -4,10 +4,11 @@ using EtkinlikYonetimSistemi.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace EtkinlikYonetimSistemi.Application.Services
 {
@@ -37,7 +38,7 @@ namespace EtkinlikYonetimSistemi.Application.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key bulunamadı"));
-
+            
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -85,8 +86,8 @@ namespace EtkinlikYonetimSistemi.Application.Services
 
                 await _kullaniciRepository.AddAsync(yeniKullanici);
 
-                var mesaj = yeniKullanici.Rol == "Admin"
-                    ? "Admin hesabı başarıyla oluşturuldu."
+                var mesaj = yeniKullanici.Rol == "Admin" 
+                    ? "Admin hesabı başarıyla oluşturuldu." 
                     : "Kayıt başarılı, onay bekleniyor.";
 
                 return new KayitDto

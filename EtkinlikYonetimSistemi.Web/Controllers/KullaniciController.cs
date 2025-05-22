@@ -5,7 +5,10 @@ using Mapster;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text;
 
 namespace EtkinlikYonetimSistemi.Web.Controllers
 {
@@ -130,7 +133,7 @@ namespace EtkinlikYonetimSistemi.Web.Controllers
             ModelState.AddModelError("", sonuc.Mesaj ?? "Şifre değiştirme işlemi başarısız oldu.");
             return View(model);
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> Cikis()
         {

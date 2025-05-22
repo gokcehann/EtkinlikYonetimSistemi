@@ -10,4 +10,4 @@ namespace EtkinlikYonetimSistemi.Application.Interfaces
         Task<DuyuruDto> UpdateAsync(DuyuruGuncelleDto dto);
         Task<bool> DeleteAsync(int id);
     }
-}
+} 

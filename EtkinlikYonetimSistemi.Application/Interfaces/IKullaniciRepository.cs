@@ -1,4 +1,5 @@
 ﻿using EtkinlikYonetimSistemi.Domain.Entities;
+using System.Security.Claims;
 
 namespace EtkinlikYonetimSistemi.Application.Interfaces
 {
