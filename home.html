@@ -6,11 +6,32 @@
     <title>Biletika - Ana Sayfa</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style type="text/css"></style>
+    <style type="text/css">
+        .event-slider {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding-bottom: 10px;
+        }
+
+        .event-card {
+            flex: 1 1 calc(33.333% - 20px); /* 3'lü grid */
+            max-width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body class="home-page">
     <nav class="navbar">
         <a href="home.html" class="navbar-logo">Biletika</a>
+        <div class="nav-categories">
+            <a href="#" class="nav-link" id="allEventsBtn">Tüm Etkinlikler</a>
+        </div>
         <div class="nav-right" style="position: relative;">
             <a href="#" class="nav-link" id="userIcon" onclick="toggleUserPanel(event)"><i class="fas fa-user"></i></a>
             <div id="userPanel" class="user-panel-dropdown" style="display: none; position: absolute; top: 40px; right: 40px; z-index: 1001;">
@@ -28,31 +49,9 @@
         <div style="flex: 1; padding: 0 20px;">
             <div class="hero-section">
                 <div class="hero-content">
-                    <h1>İlgi Alanlarına Göre Etkinlikler</h1>
+                    <h1 id="eventTitle">Tüm Etkinlikler</h1>
                     <div class="event-slider" id="eventSlider">
                         <!-- Etkinlikler JavaScript ile buraya eklenecek -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="categories-section">
-                <h2>Kategoriler</h2>
-                <div class="category-grid">
-                    <div class="category-card">
-                        <i class="fas fa-music"></i>
-                        <h3>Konser</h3>
-                    </div>
-                    <div class="category-card">
-                        <i class="fas fa-theater-masks"></i>
-                        <h3>Tiyatro</h3>
-                    </div>
-                    <div class="category-card">
-                        <i class="fas fa-running"></i>
-                        <h3>Spor</h3>
-                    </div>
-                    <div class="category-card">
-                        <i class="fas fa-calendar-alt"></i>
-                        <h3>Festival</h3>
                     </div>
                 </div>
             </div>
@@ -87,28 +86,51 @@
         <div class="footer-content">
             <div class="footer-section">
                 <h4>Hakkımızda</h4>
-                <a href="#">Biz Kimiz</a>
-                <a href="#">İletişim</a>
-                <a href="#">Kariyer</a>
-            </div>
-            <div class="footer-section">
-                <h4>Yardım</h4>
-                <a href="#">Sıkça Sorulan Sorular</a>
-                <a href="#">Bilet İade</a>
-                <a href="#">Kullanım Koşulları</a>
+                <a href="#" onclick="showAboutInfo(event)">Biz Kimiz</a>
             </div>
             <div class="footer-section">
                 <h4>Bizi Takip Edin</h4>
                 <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/lratikl/" target="_blank"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
         </div>
     </footer>
 
     <style>
+        .nav-categories {
+            display: flex;
+            gap: 30px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .nav-categories .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 5px 10px;
+            transition: color 0.3s;
+        }
+        .nav-categories .nav-link:hover {
+            color: #0358f7;
+        }
+        .nav-right {
+            margin-left: auto;
+            margin-right: 10px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .nav-right .nav-link {
+            color: white;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .nav-right .nav-link:hover {
+            color: #0358f7;
+        }
+        
         .user-panel-dropdown {
             min-width: 280px;
             background: #fff;
@@ -209,85 +231,94 @@
             ]
         };
 
-        // Tarihleri karşılaştırmak için yardımcı fonksiyon
         function compareDates(a, b) {
             const months = {
                 'Ocak': 1, 'Şubat': 2, 'Mart': 3, 'Nisan': 4, 'Mayıs': 5, 'Haziran': 6,
                 'Temmuz': 7, 'Ağustos': 8, 'Eylül': 9, 'Ekim': 10, 'Kasım': 11, 'Aralık': 12
             };
-            
             const [dayA, monthA, yearA] = a.date.split(' ');
             const [dayB, monthB, yearB] = b.date.split(' ');
-            
             if (yearA !== yearB) return yearA - yearB;
             if (months[monthA] !== months[monthB]) return months[monthA] - months[monthB];
             return parseInt(dayA) - parseInt(dayB);
         }
 
-        // Kategori eşlemesi
-        const categoryMap = {
-            'Müzik': ['Rock', 'Pop', 'Klasik', 'Halk Müziği', 'Metal', 'Rap', 'Dj'],
-            'Spor': ['Basketbol', 'Voleybol', 'Doğa Yürüyüşü', 'Formula 1'],
-            'Teknoloji': ['Teknoloji'],
-            'Gezi': ['Gezi'],
-            'Tiyatro': ['Tiyatro']
-        };
-
-        // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
             const eventSlider = document.getElementById('eventSlider');
+            const allEventsBtn = document.getElementById('allEventsBtn');
+            const eventTitle = document.getElementById('eventTitle');
             const userInterests = JSON.parse(localStorage.getItem('userInterests') || '[]');
-            
-            // Kullanıcının seçtiği kategorileri bul
-            let selectedCategories = [];
-            for (const [cat, interests] of Object.entries(categoryMap)) {
-                if (userInterests.some(i => interests.includes(i))) {
-                    selectedCategories.push(cat);
+
+            function renderAllEvents() {
+                eventSlider.innerHTML = '';
+                eventTitle.textContent = 'Tüm Etkinlikler';
+                let allEventsArr = [];
+                Object.entries(events).forEach(([interest, arr]) => {
+                    arr.forEach(event => {
+                        allEventsArr.push({ ...event, interest });
+                    });
+                });
+                allEventsArr.sort(compareDates);
+                if (allEventsArr.length === 0) {
+                    eventSlider.innerHTML = '<p style="text-align: center; width: 100%;">Hiç etkinlik bulunamadı.</p>';
+                } else {
+                    allEventsArr.forEach(event => {
+                        eventSlider.innerHTML += `
+                            <div class="event-card">
+                                <img src="${event.image || ''}" alt="${event.interest}">
+                                <div class="event-info">
+                                    <p>${event.date}</p>
+                                    <p>${event.location}</p>
+                                    <button class="ticket-btn" onclick='addToCart(${JSON.stringify(event)})'>Sepete Ekle</button>
+                                </div>
+                            </div>
+                        `;
+                    });
                 }
             }
 
-            let hasEvents = false;
-            selectedCategories.forEach(category => {
-                // Kategori başlığı ekle
-                const catTitle = document.createElement('h2');
-                catTitle.textContent = category;
-                catTitle.style.margin = '30px 0 10px 0';
-                eventSlider.appendChild(catTitle);
-                // O kategoriye ait ilgi alanlarını bul
-                const interestsInCat = categoryMap[category].filter(i => userInterests.includes(i));
-                // O ilgi alanlarına ait etkinlikleri sırala
-                let allEvents = [];
-                interestsInCat.forEach(interest => {
+            function renderInterestEvents() {
+                eventSlider.innerHTML = '';
+                eventTitle.textContent = 'İlgi Alanlarınıza Göre Etkinlikler';
+                let filteredEvents = [];
+                userInterests.forEach(interest => {
                     if (events[interest]) {
                         events[interest].forEach(event => {
-                            allEvents.push({
-                                ...event,
-                                interest: interest
-                            });
+                            filteredEvents.push({ ...event, interest });
                         });
                     }
                 });
-                allEvents.sort(compareDates);
-                // Etkinlikleri göster
-                allEvents.forEach(event => {
-                    hasEvents = true;
-                    const eventCard = `
-                        <div class="event-card">
-                            <img src="${event.image}" alt="${event.interest}">
-                            <div class="event-info">
-                                <h3>${event.interest}</h3>
-                                <p>${event.date}</p>
-                                <p>${event.location}</p>
-                                <button class="ticket-btn" onclick='addToCart(${JSON.stringify(event)})'>Sepete Ekle</button>
+                filteredEvents.sort(compareDates);
+                if (filteredEvents.length === 0) {
+                    eventSlider.innerHTML = '<p style="text-align: center; width: 100%;">İlgi alanınıza uygun etkinlik bulunamadı.</p>';
+                } else {
+                    filteredEvents.forEach(event => {
+                        eventSlider.innerHTML += `
+                            <div class="event-card">
+                                <img src="${event.image || ''}" alt="${event.interest}">
+                                <div class="event-info">
+                                    <p>${event.date}</p>
+                                    <p>${event.location}</p>
+                                    <button class="ticket-btn" onclick='addToCart(${JSON.stringify(event)})'>Sepete Ekle</button>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    eventSlider.innerHTML += eventCard;
-                });
-            });
-            if (!hasEvents) {
-                eventSlider.innerHTML = '<p style="text-align: center; width: 100%;">Henüz ilgi alanınıza uygun etkinlik bulunmamaktadır.</p>';
+                        `;
+                    });
+                }
             }
+
+            // Sayfa ilk açıldığında: ilgi alanı varsa onları, yoksa tüm etkinlikleri göster
+            if (userInterests.length > 0) {
+                renderInterestEvents();
+            } else {
+                renderAllEvents();
+            }
+
+            // Tüm Etkinlikler butonuna tıklanınca tüm etkinlikleri göster
+            allEventsBtn.onclick = function(e) {
+                e.preventDefault();
+                renderAllEvents();
+            };
         });
 
         // Sepete ekle fonksiyonu
@@ -332,9 +363,6 @@
                 <p><strong>Soyad:</strong> ${userInfo?.lastName || 'Belirtilmemiş'}</p>
                 <p><strong>E-posta:</strong> ${userInfo?.email || 'Belirtilmemiş'}</p>
             `;
-            if (userInfo && (userInfo.isAdmin === true || userInfo.role === 'admin')) {
-                html += `<p style="margin-top:8px;color:#e6b800;font-weight:bold;"><i class='fas fa-star' style='color:#e6b800;margin-right:4px;'></i>Admin</p>`;
-            }
             userDetails.innerHTML = html;
         }
         function logout() {
@@ -342,6 +370,11 @@
             loadUserInfo();
             document.getElementById('userPanel').style.display = 'none';
             window.location.href = 'index.html';
+        }
+
+        function showAboutInfo(event) {
+            event.preventDefault();
+            alert("Gökçehan Özdemir 230707042\nRümeysa Atik 230707032");
         }
     </script>
 </body>

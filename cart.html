@@ -453,6 +453,18 @@
         // Ödeme tamamlama fonksiyonu
         function completePayment() {
             const method = document.querySelector('input[name="payment"]:checked').value;
+            if (method === 'Kredi Kartı') {
+                // Kart bilgileri kontrolü
+                const firstname = document.getElementById('firstname').value.trim();
+                const lastname = document.getElementById('lastname').value.trim();
+                const cardnumber = document.getElementById('cardnumber').value.trim();
+                const expdate = document.getElementById('expdate').value.trim();
+                const cvv = document.getElementById('cvv').value.trim();
+                if (!firstname || !lastname || !cardnumber || !expdate || !cvv) {
+                    alert('Lütfen tüm kart bilgilerini eksiksiz doldurun!');
+                    return;
+                }
+            }
             closePaymentModal();
             // Sepeti boşalt
             localStorage.setItem('cart', '[]');

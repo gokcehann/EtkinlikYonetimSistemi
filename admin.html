@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biletika - Admin Paneli</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .admin-container {
+            display: flex;
+            margin-top: 20px;
+            min-height: calc(100vh - 200px);
+            gap: 15px;
+            padding: 0 15px;
+            justify-content: space-between;
+        }
+        
+        .admin-sidebar, .admin-main-content, .admin-right-sidebar {
+            width: 30%;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .admin-section {
+            margin-bottom: 20px;
+        }
+        
+        .admin-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0358f7;
+        }
+
+        .admin-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 3px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .form-group input[type="number"]::-webkit-outer-spin-button,
+        .form-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .admin-button {
+            background-color: #0358f7;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .admin-button:hover {
+            background-color: #0247c7;
+        }
+        
+        .admin-button.delete {
+            background-color: #dc3545;
+        }
+        
+        .admin-button.delete:hover {
+            background-color: #b52a37;
+        }
+
+        .user-panel-dropdown {
+            min-width: 280px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            padding: 0;
+            font-size: 15px;
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            z-index: 1001;
+        }
+
+        .user-panel-box {
+            padding: 18px 18px 12px 18px;
+        }
+
+        .user-panel-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 17px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .admin-badge {
+            color: #e6b800;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .user-panel-details p {
+            margin: 3px 0;
+            color: #444;
+            font-size: 15px;
+        }
+
+        .user-panel-details strong {
+            color: #888;
+            font-weight: 500;
+        }
+
+        .user-panel-logout {
+            width: 100%;
+            margin-top: 12px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 0;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .user-panel-logout:hover {
+            background: #b52a37;
+        }
+
+        .user-approval-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .user-approval-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-approval-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-approval-email {
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .approve-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.3s;
+        }
+
+        .approve-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body class="home-page">
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">Biletika</a>
+        <div class="nav-right" style="position: relative;">
+            <a href="#" class="nav-link" id="userIcon" onclick="toggleUserPanel(event)"><i class="fas fa-user"></i></a>
+            <div id="userPanel" class="user-panel-dropdown" style="display: none;">
+                <div class="user-panel-box">
+                    <div class="user-panel-title">
+                        <span>Kullanıcı Bilgileri</span>
+                        <span class="admin-badge"><i class="fas fa-star"></i>Admin</span>
+                    </div>
+                    <div id="userDetails" class="user-panel-details"></div>
+                    <button onclick="logout()" class="user-panel-logout">Çıkış Yap</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <div class="admin-section">
+                <h2>Etkinlik İşlemleri</h2>
+                
+                <div class="form-group">
+                    <h3>Etkinlik Ekle</h3>
+                    <form id="addEventForm">
+                        <div class="form-group">
+                            <label for="eventName">Ad:</label>
+                            <input type="text" id="eventName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDescription">Açıklama:</label>
+                            <input type="text" id="eventDescription" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventCapacity">Kapasite:</label>
+                            <input type="number" id="eventCapacity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventCategory">Kategori:</label>
+                            <input type="text" id="eventCategory" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventCity">Şehir:</label>
+                            <input type="text" id="eventCity" required>
+                        </div>
+                        <button type="submit" class="admin-button">Ekle</button>
+                    </form>
+                </div>
+
+                <div class="form-group">
+                    <h3>Etkinlik Güncelle</h3>
+                    <form id="updateEventForm">
+                        <div class="form-group">
+                            <label for="updateEventName">Ad:</label>
+                            <input type="text" id="updateEventName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateEventDescription">Açıklama:</label>
+                            <input type="text" id="updateEventDescription" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateEventCapacity">Kapasite:</label>
+                            <input type="number" id="updateEventCapacity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateEventCategory">Kategori:</label>
+                            <input type="text" id="updateEventCategory" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateEventCity">Şehir:</label>
+                            <input type="text" id="updateEventCity" required>
+                        </div>
+                        <button type="submit" class="admin-button">Güncelle</button>
+                    </form>
+                </div>
+
+                <div class="form-group">
+                    <h3>Etkinlik Sil</h3>
+                    <form id="deleteEventForm">
+                        <div class="form-group">
+                            <label for="deleteEventId">ID:</label>
+                            <input type="number" id="deleteEventId" required>
+                        </div>
+                        <button type="submit" class="admin-button delete">Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-main-content">
+            <div class="admin-section">
+                <h2>Duyuru İşlemleri</h2>
+                
+                <div class="form-group">
+                    <h3>Duyuru Ekle</h3>
+                    <form id="addAnnouncementForm">
+                        <div class="form-group">
+                            <label for="announcementTitle">Başlık:</label>
+                            <input type="text" id="announcementTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementContent">İçerik:</label>
+                            <input type="text" id="announcementContent" required>
+                        </div>
+                        <button type="submit" class="admin-button">Ekle</button>
+                    </form>
+                </div>
+
+                <div class="form-group">
+                    <h3>Duyuru Güncelle</h3>
+                    <form id="updateAnnouncementForm">
+                        <div class="form-group">
+                            <label for="updateAnnouncementTitle">Başlık:</label>
+                            <input type="text" id="updateAnnouncementTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateAnnouncementContent">İçerik:</label>
+                            <input type="text" id="updateAnnouncementContent" required>
+                        </div>
+                        <button type="submit" class="admin-button">Güncelle</button>
+                    </form>
+                </div>
+
+                <div class="form-group">
+                    <h3>Duyuru Sil</h3>
+                    <form id="deleteAnnouncementForm">
+                        <div class="form-group">
+                            <label for="deleteAnnouncementId">ID:</label>
+                            <input type="number" id="deleteAnnouncementId" required>
+                        </div>
+                        <button type="submit" class="admin-button delete">Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-right-sidebar">
+            <div class="admin-section">
+                <h2>Kullanıcı Onay İşlemleri</h2>
+                <ul class="user-approval-list">
+                    <li class="user-approval-item">
+                        <span class="user-approval-email">kullanici1@example.com</span>
+                        <button class="approve-button">Onayla</button>
+                    </li>
+                    <li class="user-approval-item">
+                        <span class="user-approval-email">kullanici2@example.com</span>
+                        <button class="approve-button">Onayla</button>
+                    </li>
+                    <li class="user-approval-item">
+                        <span class="user-approval-email">kullanici3@example.com</span>
+                        <button class="approve-button">Onayla</button>
+                    </li>
+                    <li class="user-approval-item">
+                        <span class="user-approval-email">kullanici4@example.com</span>
+                        <button class="approve-button">Onayla</button>
+                    </li>
+                    <li class="user-approval-item">
+                        <span class="user-approval-email">kullanici5@example.com</span>
+                        <button class="approve-button">Onayla</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Hakkımızda</h4>
+                <a href="#" onclick="showAboutInfo(event)">Biz Kimiz</a>
+            </div>
+            <div class="footer-section">
+                <h4>Bizi Takip Edin</h4>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/lratikl/" target="_blank"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Kullanıcı paneli işlemleri
+        function toggleUserPanel(event) {
+            event.preventDefault();
+            const panel = document.getElementById('userPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function showAboutInfo(event) {
+            event.preventDefault();
+            alert("Gökçehan Özdemir 230707042\nRümeysa Atik 230707032");
+        }
+
+        function logout() {
+            // Çıkış işlemleri burada yapılacak
+            window.location.href = 'index.html';
+        }
+
+        // Form işlemleri
+        document.getElementById('addEventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Etkinlik ekleme işlemleri burada yapılacak
+        });
+
+        document.getElementById('updateEventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Etkinlik güncelleme işlemleri burada yapılacak
+        });
+
+        document.getElementById('deleteEventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Etkinlik silme işlemleri burada yapılacak
+        });
+
+        // Duyuru form işlemleri
+        document.getElementById('addAnnouncementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Duyuru ekleme işlemleri burada yapılacak
+        });
+
+        document.getElementById('updateAnnouncementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Duyuru güncelleme işlemleri burada yapılacak
+        });
+
+        document.getElementById('deleteAnnouncementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Duyuru silme işlemleri burada yapılacak
+        });
+
+        // Kullanıcı onay işlemleri
+        document.querySelectorAll('.approve-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const email = this.previousElementSibling.textContent;
+                if (this.textContent === 'Onayla') {
+                    // Kullanıcı onaylama işlemleri burada yapılacak
+                    this.textContent = 'Onaylandı';
+                    this.disabled = false;
+                    this.style.backgroundColor = '#6c757d';
+                } else {
+                    // Kullanıcı onayını kaldırma işlemleri burada yapılacak
+                    this.textContent = 'Onayla';
+                    this.style.backgroundColor = '#28a745';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
